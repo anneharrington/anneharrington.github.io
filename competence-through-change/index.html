@@ -4,19 +4,1798 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Competence Through Change: A Unified View of Continual Learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
 <style>
-  body {
-    font-family: Georgia, "Times New Roman", serif;
-    max-width: 38rem; margin: 22vh auto 0; padding: 0 1.5rem;
-    color: #14181f; line-height: 1.6;
+  :root {
+    --ink:    #14181f;
+    --paper:  #ffffff;
+    --gray:   #586273;
+    --faint:  #ccd5e2;
+    --grid:   #e7ecf3;
+    --signature: #1d4ed8;
+    --red:    #c2410c;
+    --space:  #1d4ed8;
+    --time:   #0e7490;
+
+    --c-tooluse: #2563eb;
+    --c-finqa:   #db2777;
+    --c-bio:     #0e7490;
+    --c-past:    #2563eb;
+    --c-future:  #db2777;
+    --c-base:    #9b8847;
+
+    /* fluid reading measure: grows with the viewport to fill the window */
+    --measure: clamp(33rem, 60vw, 68rem);
+
+    --display: "Source Serif 4", Georgia, serif;
+    --body:    "Source Serif 4", Georgia, serif;
+    --sans:    "Source Serif 4", Georgia, serif;
   }
-  h1 { font-weight: 600; font-size: 2.2rem; line-height: 1.18; letter-spacing: -0.01em; margin: 0 0 1rem; }
-  p { color: #586273; font-size: 1.1rem; margin: 0; }
-  a { color: #1d4ed8; }
+  * { box-sizing: border-box; }
+  html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--paper); color: var(--ink);
+    font-family: var(--body); font-weight: 400;
+    font-size: 1.2rem; line-height: 1.7; margin: 0;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+  .page { max-width: 1500px; margin: 0 auto; padding: 0 5vw; }
+  header, section > p, .note { max-width: var(--measure); }
+  html { scroll-behavior: smooth; overflow-x: clip; }
+  section { scroll-margin-top: 2rem; }
+
+  /* ── Table-of-contents sidebar ─────────────────────────────────── */
+  .toc {
+    position: fixed; top: 7rem; left: 2rem; width: 11rem; z-index: 10;
+    font-family: var(--sans); max-height: calc(100vh - 9rem); overflow-y: auto;
+  }
+  .toc-title {
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--gray); margin: 0 0 0.7rem 0.7rem;
+  }
+  .toc ul { list-style: none; padding: 0; margin: 0; }
+  .toc a {
+    display: block; padding: 0.3rem 0 0.3rem 0.7rem;
+    font-size: 0.82rem; line-height: 1.3; color: var(--gray);
+    text-decoration: none; border-left: 2px solid var(--grid);
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .toc a:hover { color: var(--ink); border-left-color: var(--faint); }
+  .toc a.active { color: var(--signature); border-left-color: var(--signature); font-weight: 600; }
+  .toc-toggle { display: none; }
+  .toc-backdrop { display: none; }
+
+  /* On narrower screens the sidebar becomes a slide-in drawer. */
+  @media (max-width: 1200px) {
+    .toc-toggle {
+      display: block; position: fixed; top: 1rem; left: 1rem; z-index: 40;
+      font-family: var(--sans); font-size: 0.78rem; font-weight: 600;
+      letter-spacing: 0.03em; color: var(--signature);
+      background: var(--paper); border: 1px solid var(--faint);
+      border-radius: 999px; padding: 0.5em 0.95em; cursor: pointer;
+      box-shadow: 0 1px 5px rgba(20,24,31,0.12);
+    }
+    .toc-backdrop {
+      display: block; position: fixed; inset: 0; background: rgba(20,24,31,0.35);
+      opacity: 0; pointer-events: none; transition: opacity 0.25s ease; z-index: 30;
+    }
+    body.toc-open .toc-backdrop { opacity: 1; pointer-events: auto; }
+    .toc {
+      top: 0; left: 0; width: 15rem; height: 100vh; max-height: 100vh;
+      background: var(--paper); box-shadow: 2px 0 18px rgba(20,24,31,0.14);
+      padding: 4.5rem 1.4rem 1.5rem; z-index: 35;
+      transform: translateX(-100%); transition: transform 0.25s ease;
+    }
+    body.toc-open .toc { transform: translateX(0); }
+  }
+
+  .masthead { padding: 8rem 0 4rem; border-bottom: 1px solid var(--faint); margin: 0 auto 5rem; }
+  .imprint {
+    font-family: var(--sans); font-size: 0.7rem; font-weight: 500;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--signature); margin: 0 0 2.5rem;
+  }
+  h1 {
+    font-family: var(--display); font-weight: 600;
+    font-size: clamp(1.9rem, 3.2vw, 3rem);
+    line-height: 1.15; letter-spacing: -0.005em;
+    margin: 0 0 1.8rem; max-width: none;
+  }
+  .standfirst {
+    font-family: var(--body); font-weight: 400; color: var(--gray);
+    font-size: 1.35rem; line-height: 1.5; max-width: var(--measure); margin: 0;
+  }
+  .authors {
+    font-family: var(--sans); font-size: 0.98rem; font-weight: 500;
+    color: var(--ink);
+    margin: 2.5rem 0 0; line-height: 1.7; max-width: var(--measure);
+  }
+  .authors .sep { color: var(--faint); margin: 0 0.55em; font-weight: 400; }
+  .authors .name { white-space: nowrap; }
+  .authors .name sup { font-size: 0.66em; color: var(--signature); font-weight: 600; margin-left: 1px; }
+  .affiliations {
+    font-family: var(--sans); font-size: 0.84rem; color: var(--gray);
+    margin: 0.7rem 0 0; line-height: 1.6; max-width: var(--measure);
+  }
+  .affiliations sup { color: var(--signature); font-weight: 600; margin-right: 2px; }
+  .affiliations .sep { color: var(--faint); margin: 0 0.55em; }
+
+  section { margin: 0 auto 5.5rem; max-width: var(--measure); position: relative; }
+  .secnum {
+    font-family: var(--sans); font-size: 1.05rem; font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--signature); margin: 0 0 0.7rem;
+  }
+  h2 {
+    font-family: var(--display); font-weight: 600;
+    font-size: 1.65rem; line-height: 1.22; letter-spacing: 0;
+    margin: 0 0 1.2rem;
+  }
+  .note {
+    color: var(--ink); font-size: 1.18rem; line-height: 1.7;
+    margin: 0 0 1.6rem;
+  }
+  .note em { font-style: italic; }
+  .pullquote {
+    font-family: var(--display); font-style: italic;
+    font-size: 1.5rem; line-height: 1.35; color: var(--ink);
+    border-left: 2px solid var(--signature);
+    padding: 0.2em 0 0.2em 1.2em;
+    margin: 2.2rem 0 2.2rem;
+    max-width: var(--measure);
+  }
+
+  /* ── Definition bubble ─────────────────────────────────────────── */
+  .callout {
+    max-width: var(--measure);
+    background: #f1f5ff; border: 1px solid #d6e1fb;
+    border-radius: 8px;
+    padding: 1.3rem 1.6rem; margin: 2.2rem 0;
+  }
+  .callout .label {
+    display: block; font-family: var(--sans); font-weight: 600;
+    font-size: 0.72rem; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--signature); margin-bottom: 0.55rem;
+  }
+  .callout .def { font-size: 1.18rem; line-height: 1.55; color: var(--ink); margin: 0; }
+  .callout .def strong { font-weight: 600; color: var(--ink); }
+
+  /* ── Boxed thesis statement ────────────────────────────────────── */
+  .statement {
+    max-width: var(--measure); margin: 2.6rem 0;
+    font-family: var(--sans); font-weight: 600;
+    font-size: 1.32rem; line-height: 1.32; letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .statement .accent { color: var(--signature); }
+
+  /* ── Per-section insight bubble ────────────────────────────────── */
+  .insight-bubble {
+    max-width: var(--measure);
+    display: flex; gap: 0.95rem; align-items: baseline;
+    background: #f1f5ff; border: 1px solid #dce6fc;
+    border-radius: 8px;
+    padding: 1rem 1.3rem; margin: 1.6rem 0 0;
+  }
+  .insight-bubble .ib-label {
+    font-family: var(--sans); font-weight: 600; font-size: 0.68rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--signature);
+    white-space: nowrap;
+  }
+  .insight-bubble p {
+    margin: 0; font-family: var(--sans);
+    font-size: 1rem; line-height: 1.5; color: var(--ink);
+  }
+
+  /* ── Coming-soon placeholder ───────────────────────────────────── */
+  .coming-soon {
+    max-width: var(--measure);
+    display: flex; align-items: center; gap: 0.9rem;
+    border: 1px dashed var(--faint); border-radius: 10px;
+    background: #f7f9fc; padding: 1.5rem 1.7rem; margin: 0.4rem 0 0;
+  }
+  .cs-badge {
+    font-family: var(--sans); font-weight: 600; font-size: 0.72rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--signature); background: #e7eefe;
+    padding: 0.34em 0.75em; border-radius: 999px; white-space: nowrap;
+  }
+  .cs-note { font-family: var(--sans); font-size: 0.95rem; color: var(--gray); }
+
+  /* ── Citation code block ───────────────────────────────────────── */
+  .codeblock {
+    position: relative; max-width: var(--measure);
+    background: #0f172a; border-radius: 10px;
+    padding: 1.1rem 1.2rem; overflow-x: auto; margin-top: 0.4rem;
+  }
+  .codeblock pre { margin: 0; }
+  .codeblock code {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.8rem; line-height: 1.55; color: #cbd5e1; white-space: pre;
+  }
+  .copy-btn {
+    position: absolute; top: 0.7rem; right: 0.7rem;
+    font-family: var(--sans); font-size: 0.72rem; font-weight: 600;
+    color: #cbd5e1; background: #1e293b; border: 1px solid #334155;
+    border-radius: 6px; padding: 0.3em 0.7em; cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .copy-btn:hover { background: #334155; color: #fff; }
+  .copy-btn.copied { background: var(--signature); color: #fff; border-color: var(--signature); }
+
+  /* ── Related-work links ────────────────────────────────────────── */
+  ul.links { list-style: none; padding: 0; margin: 1.4rem 0 0; max-width: var(--measure); }
+  ul.links li {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 1.2rem;
+    padding: 0.75rem 0; border-bottom: 1px solid var(--grid);
+  }
+  ul.links li:first-child { border-top: 1px solid var(--grid); }
+  ul.links a { color: var(--ink); text-decoration: none; font-size: 1.05rem; }
+  ul.links a:hover { color: var(--signature); text-decoration: underline; }
+  ul.links .src {
+    font-family: var(--sans); font-size: 0.82rem; color: var(--gray);
+    white-space: nowrap; flex: none;
+  }
+
+  figure { margin: 0 0 1rem; }
+  svg { display: block; max-width: 100%; height: auto; overflow: visible; }
+  text { font-family: var(--body); fill: var(--ink); }
+  .axis-text { font-family: var(--sans); font-size: 11px; fill: var(--gray); }
+  .axis-num  { font-family: var(--sans); font-size: 10px; fill: var(--gray); }
+  .data-label { font-family: var(--body); font-size: 12px; }
+  .strong-label { font-family: var(--sans); font-weight: 600; font-size: 12px; fill: var(--ink); }
+  .panel-title { font-family: var(--sans); font-weight: 600; font-size: 13.5px; fill: var(--ink); }
+
+  .caption {
+    display: block; font-family: var(--sans);
+    font-size: 0.78rem; line-height: 1.55;
+    color: var(--gray); margin-top: 0.8rem; max-width: var(--measure);
+  }
+  hr.rule { border: none; border-top: 1px solid var(--faint); margin: 0 auto 5rem; max-width: var(--measure); }
+
+  .chip {
+    font-family: var(--sans); font-weight: 600; font-size: 0.78rem;
+    padding: 0.18em 0.55em; border-radius: 2px;
+    background: var(--grid); color: var(--ink);
+    letter-spacing: 0.02em; white-space: nowrap;
+  }
+  .chip.prompt  { background: #f0e2d8; color: #8C3D00; }
+  .chip.offline { background: #dfe9da; color: #005A42; }
+  .chip.online  { background: #f5dcd8; color: #9c2f24; }
+  .chip.context { background: #d6e4ee; color: #00557F; }
+  .chip.space   { background: #e7eefe; color: #1d4ed8; }
+  .chip.time    { background: #e0f3f6; color: #0e7490; }
+
+  /* ── Recommendation scorecard (method × regime) ───────────────── */
+  .scorecard-scroll { overflow-x: auto; padding: 0.5rem 0; }
+  table.scorecard {
+    border-collapse: collapse; width: 100%;
+    font-family: var(--sans); min-width: 720px;
+  }
+  table.scorecard th {
+    text-align: center; font-family: var(--sans); font-weight: 600; color: var(--ink);
+    font-size: 0.82rem; letter-spacing: 0.02em;
+    border-bottom: 1px solid var(--ink);
+    padding: 0 0.8em 0.55rem; vertical-align: bottom; white-space: nowrap;
+  }
+  table.scorecard th.th-method { text-align: left; padding-left: 0; }
+  table.scorecard th.th-insight { text-align: left; }
+  table.scorecard th .sub {
+    display: block; font-weight: 400; font-size: 0.7rem;
+    color: var(--gray); letter-spacing: 0.01em; margin-top: 0.25rem;
+  }
+  table.scorecard th .sub em { font-style: italic; }
+  table.scorecard td {
+    padding: 0.7rem 0.8em; text-align: center; vertical-align: middle;
+    border-bottom: 1px solid var(--grid);
+  }
+  table.scorecard td.method {
+    text-align: left; padding-left: 0; font-weight: 600;
+    font-size: 0.98rem; white-space: nowrap;
+  }
+  table.scorecard td.method.offline { color: #005A42; }
+  table.scorecard td.method.online  { color: #9c2f24; }
+  table.scorecard td.method.prompt  { color: #8C3D00; }
+  table.scorecard td.method.context { color: #00557F; }
+  table.scorecard td.method .dot {
+    display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+    background: currentColor; margin-right: 0.5em; vertical-align: middle;
+  }
+  table.scorecard .yes {
+    color: #15803d; font-size: 1.1rem; font-weight: 600;
+  }
+  table.scorecard .no { color: var(--red); font-size: 1.05rem; opacity: 0.42; }
+  table.scorecard td.insight {
+    text-align: left; font-family: var(--sans); font-style: italic;
+    font-size: 0.84rem; line-height: 1.45; color: var(--gray);
+    max-width: 24rem;
+  }
+
+  table.spark {
+    border-collapse: collapse; font-size: 1.02rem;
+    width: 100%; max-width: 44rem; margin: 1.5rem auto 1rem;
+  }
+  table.spark th {
+    text-align: left; font-family: var(--sans); font-weight: 600; color: var(--ink);
+    font-size: 0.82rem; letter-spacing: 0.02em;
+    border-bottom: 1px solid var(--ink);
+    padding: 0 1.2em 0.5rem 0;
+  }
+  table.spark td {
+    padding: 0.55rem 1.2em 0.55rem 0; vertical-align: middle;
+    border-bottom: 1px solid var(--grid);
+  }
+  table.spark td .sub {
+    display: block; font-size: 0.78rem; color: var(--gray); margin-top: 0.12rem;
+  }
+  table.spark td.rec-best { font-weight: 700; color: #15803d; }
+  table.spark.rec { width: auto; max-width: 100%; }
+  table.spark.rec th:nth-child(n+2), table.spark.rec td:nth-child(n+2) { text-align: center; padding: 0.55rem 0.9em; }
+  table.spark.rec .na { color: var(--faint); }
+  table.spark.methods { width: auto; max-width: 100%; }
+  table.spark.methods td:nth-child(3) { padding-right: 2.4em; }
+
+  .teaser { max-width: calc(var(--measure) * 0.86); margin: 0.4rem auto 1.2rem; }
+  .teaser img { width: 100%; height: auto; display: block; }
+
+  .figure-wide { margin: 0 -3vw 1rem; }
+  .figure-wide svg { width: 100%; max-width: 1100px; margin: 0 auto; }
+
+  /* tiny inline legend */
+  .legend {
+    font-family: var(--sans); font-size: 0.78rem; color: var(--gray);
+    display: flex; flex-wrap: wrap; gap: 1.2em; margin: 0.5rem 0 0;
+  }
+  .legend .swatch { display: inline-block; width: 1.4em; height: 2px;
+                    vertical-align: middle; margin-right: 0.4em; }
+  .legend .swatch.dashed { border-top: 2px dashed currentColor; height: 0; }
+  .legend .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+                 vertical-align: middle; margin-right: 0.4em; }
+
+  /* ── animations ──────────────────────────────────────────────────
+     Subtle scroll-triggered fade + slight rise. One pass only —
+     elements don't re-animate when scrolled back to.
+  */
+  @media (prefers-reduced-motion: no-preference) {
+    .masthead h1, .masthead .standfirst, .masthead .authors {
+      opacity: 0; transform: translateY(14px);
+      animation: rise 0.9s cubic-bezier(.2,.6,.2,1) forwards;
+    }
+    .masthead h1            { animation-delay: 0.10s; }
+    .masthead .standfirst   { animation-delay: 0.32s; }
+    .masthead .authors      { animation-delay: 0.55s; }
+    @keyframes rise {
+      to { opacity: 1; transform: none; }
+    }
+
+    /* Section fade — pure opacity, slow enough to be perceived as
+       the user scrolls into the section. */
+    section { opacity: 0;
+              transition: opacity 0.9s cubic-bezier(.2,.6,.2,1); }
+    section.in-view { opacity: 1; }
+
+    /* Hover lift on method chips (legend + inline html) */
+    .chip { transition: transform 0.18s ease, filter 0.18s ease; }
+    .chip:hover { transform: translateY(-1px); filter: brightness(0.96); }
+
+    /* Plot curves draw themselves in when the FIGURE enters the
+       viewport (not just the section heading) — so by the time the
+       user is looking at the plot, the line is actively tracing.
+       Per-figure observer set up in JS below.
+
+       1.8s draw, 1.2s delay before points/stars fade — so the
+       animation lasts long enough that the user clearly watches
+       the line travel across the panel. */
+    .figure-wide svg path.curve {
+      stroke-dasharray: 800;
+      stroke-dashoffset: 800;
+      transition: stroke-dashoffset 1.8s cubic-bezier(.4,.1,.2,1);
+    }
+    .figure-wide.revealed svg path.curve { stroke-dashoffset: 0; }
+    .figure-wide svg .point, .figure-wide svg .star {
+      opacity: 0;
+      transition: opacity 0.7s ease 1.3s;
+    }
+    .figure-wide.revealed svg .point,
+    .figure-wide.revealed svg .star { opacity: 1; }
+  }
 </style>
 </head>
 <body>
-  <h1>Competence Through Change:<br>A Unified View of Continual Learning</h1>
-  <p>Project page coming soon.</p>
+
+<button class="toc-toggle" aria-label="Open contents" aria-expanded="false">☰ Contents</button>
+<div class="toc-backdrop"></div>
+<nav class="toc" aria-label="Table of contents">
+  <p class="toc-title">Contents</p>
+  <ul>
+    <li><a href="#premise">Premise</a></li>
+    <li><a href="#framing">Framing</a></li>
+    <li><a href="#framework">Methods Overview</a></li>
+    <li><a href="#domain">Domain shift</a></li>
+    <li><a href="#noisy">Noisy drift</a></li>
+    <li><a href="#discrete">Discrete updates</a></li>
+    <li><a href="#takeaway">Takeaway</a></li>
+    <li><a href="#next">What's next</a></li>
+    <li><a href="#related">Related work</a></li>
+    <li><a href="#cite">Cite</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+
+  <!-- ============== MASTHEAD ============== -->
+  <header class="masthead">
+    <h1>Competence Through Change:<br>A Unified View of Continual Learning</h1>
+    <p class="standfirst">An overview of our project on continual learning in large language models. Methods for continual learning (prompting, fine-tuning, reinforcement learning, and context compression) are usually studied in isolation. We propose a framework that lets us evaluate them together on the same sequential benchmarks, and ask one question: <em>when does continual learning require learning?</em></p>
+    <p class="authors">
+      <span class="name">Anne Harrington<sup>1*</sup></span><span class="sep">·</span>
+      <span class="name">Nayan Saxena<sup>2</sup></span><span class="sep">·</span>
+      <span class="name">Michael Murphy<sup>1</sup></span><span class="sep">·</span>
+      <span class="name">Anastasia Borovykh<sup>3</sup></span><span class="sep">·</span>
+      <span class="name">Sridhar Kamath<sup>2</sup></span><span class="sep">·</span>
+      <span class="name">Ara Eindra Kyi<sup>2</sup></span><span class="sep">·</span>
+      <span class="name">Trevor Darrell<sup>1</sup></span><span class="sep">·</span>
+      <span class="name">Jitendra Malik<sup>1</sup></span><span class="sep">·</span>
+      <span class="name">Yutong Bai<sup>1*</sup></span>
+    </p>
+    <p class="affiliations">
+      <sup>*</sup>Equal contribution<span class="sep">·</span>
+      <sup>1</sup>UC Berkeley<span class="sep">·</span>
+      <sup>2</sup>Independent<span class="sep">·</span>
+      <sup>3</sup>Capital Fund Management
+    </p>
+  </header>
+
+  <!-- ============== SECTION 1: PREMISE ============== -->
+  <section id="premise">
+    <p class="secnum">One · Premise</p>
+    <h2>Continual learning is not one problem.</h2>
+    <p class="note">
+      For decades, continual learning was defined as the problem of
+      mitigating <em>catastrophic forgetting</em>: how do you learn task B
+      without erasing task A? Classic approaches kept old skills intact by
+      composing or partitioning model parameters, and benchmarks measured
+      how cleanly a model could hold a chain of disjoint tasks at once.
+    </p>
+    <p class="note">
+      In the era of large language models, the problem is more nuanced.
+      These models are already extremely capable, having undergone extensive
+      pre-, mid-, and post-training, so the property that matters after
+      deployment is no longer whether they retain old tasks, but whether they
+      become more capable as the world they operate in changes. The community
+      has approached this in fragments: continual learning as a <em>memory</em>
+      problem (retrieval, in-context learning, context management), a
+      <em>steering</em> problem (prompt optimization), a <em>reasoning</em>
+      problem (reinforcement learning and distillation), and a
+      <em>compression</em> problem (architectural updates). Each takes a
+      different bet on what continual learning requires, but the field still
+      lacks a shared frame in which those bets can be compared.
+    </p>
+    <p class="note">
+      We take a different starting point. The change in the data that
+      matters for continual learning has structure, and the operative
+      question is not whether a method handles change, but
+      <em>which kind</em>.
+    </p>
+    <p class="statement">
+      Continual learning is not one problem, and
+      <span class="accent">it is not solved.</span>
+    </p>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ============== SECTION 2: THE FRAMING ============== -->
+  <section id="framing">
+    <p class="secnum">Two · Framing</p>
+    <h2>Space and time.</h2>
+    <div class="callout">
+      <span class="label">Our definition</span>
+      <p class="def"><strong>Continual learning is the problem of making a
+      model more capable as the world it operates in changes</strong>, not
+      just remembering old tasks. This definition lets us evaluate a wide
+      range of methods on equal footing, whatever each one updates.</p>
+    </div>
+    <p class="note">
+      We measure capability by examining how a model learns under different
+      kinds of data change. We separate those changes along two axes. Space
+      is domain shift: a new task or distribution. Time holds the task fixed
+      while the world drifts. We study two kinds: a slow temporal drift,
+      where the signal shifts gradually year over year (companies' annual
+      10-K financial filings), and a selective change, where a single fact is
+      updated while the rest must be preserved (facts edited between
+      Wikipedia revisions). We return to each in Sections Five and Six.
+    </p>
+    <figure class="teaser">
+      <img src="teaser.png" style="width:100%;height:auto;display:block;"
+           alt="Space and Time. Space: domain shift. Time: temporal drift in 10-K filings, and selective change in Wikipedia facts.">
+    </figure>
+    <span class="caption">
+      The settings we evaluate, organised by Space and Time.
+    </span>
+    <div class="insight-bubble">
+      <span class="ib-label">Insight</span>
+      <p>Most benchmarks measure a single static snapshot; each of these
+      settings instead asks whether a model keeps improving as its world
+      changes.</p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ============== SECTION 3: THE FRAMEWORK ============== -->
+  <section id="framework">
+    <p class="secnum">Three · Methods Overview</p>
+    <h2>Eight methods tested.</h2>
+    <p class="note">
+      Our framework recasts standard LLM benchmarks as sequential problems
+      and evaluates every method under one mechanism-agnostic protocol, so
+      prompt, weight, and architectural updates can be compared on equal
+      ground. We run eight methods across four families on a single backbone
+      (Qwen3-8B); they differ in what they carry across a stage boundary: a
+      prompt, the weights, or a small per-stage component on a frozen
+      backbone.
+    </p>
+    <table class="spark methods">
+      <thead>
+        <tr><th>Family</th><th>Method</th><th>Carries across a stage</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="chip prompt">Prompt</span></td><td>GEPA</td><td>evolved prompt</td></tr>
+        <tr><td><span class="chip prompt">Prompt</span></td><td>ACE</td><td>markdown playbook</td></tr>
+        <tr><td><span class="chip offline">Offline</span></td><td>SFT</td><td>full parameters</td></tr>
+        <tr><td><span class="chip offline">Offline</span></td><td>SDFT</td><td>parameters + teacher (previous self)</td></tr>
+        <tr><td><span class="chip online">Online</span></td><td>GRPO</td><td>full parameters</td></tr>
+        <tr><td><span class="chip online">Online</span></td><td>SDPO</td><td>parameters + preference pool</td></tr>
+        <tr><td><span class="chip context">Compression</span></td><td>Cartridges</td><td>backbone + per-stage adapter</td></tr>
+        <tr><td><span class="chip context">Compression</span></td><td>In-Place TTT</td><td>per-input update (reset)</td></tr>
+      </tbody>
+    </table>
+
+    <p class="note" style="margin-top:2.4rem;">
+      Which method to use depends on the kind of change you face. Each cell is
+      the best method in that family for that change; bold marks the best
+      choice overall.
+    </p>
+    <table class="spark rec">
+      <thead>
+        <tr>
+          <th>Kind of change</th>
+          <th><span class="chip prompt">Prompt</span></th>
+          <th><span class="chip offline">Offline</span></th>
+          <th><span class="chip online">Online</span></th>
+          <th><span class="chip context">Compression</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>New domain or task<span class="sub">disjoint tasks</span></td>
+          <td>GEPA<sup>*</sup></td>
+          <td class="rec-best">SDFT</td>
+          <td>SDPO</td>
+          <td>Cartridges</td>
+        </tr>
+        <tr>
+          <td>Noisy slow trend<span class="sub">10-K filings</span></td>
+          <td>ACE</td>
+          <td class="rec-best">SDFT</td>
+          <td>SDPO</td>
+          <td>Cartridges</td>
+        </tr>
+        <tr>
+          <td>Discrete fact change<span class="sub">Wikipedia revisions</span></td>
+          <td>ACE</td>
+          <td>SDFT</td>
+          <td class="rec-best">GRPO</td>
+          <td>Cartridges</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="note" style="font-size:0.88rem; color:var(--gray); margin-top:0.7rem;">
+      Bold marks the best choice overall; the other cells are the strongest
+      option within that family, which may still be weak for a given change.
+      <sup>*</sup>GEPA only if you keep a separate prompt per task.
+    </p>
+
+    <div class="insight-bubble">
+      <span class="ib-label">Insight</span>
+      <p>No single method wins everywhere: distillation leads when knowledge
+      must accumulate, on-policy RL when a fact must be overwritten, and the
+      two prompt-only methods never win.</p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ============== SECTION 4: DOMAIN SHIFT ============== -->
+  <section id="domain">
+    <p class="secnum">Four · Space: domain shift</p>
+    <h2>Does experience compound across disjoint domains?</h2>
+    <p class="note">
+      We train on three unrelated tasks in sequence: ToolUse, then FinQA,
+      then SciKE-Bio. After each stage we evaluate on all three held-out
+      sets, and the star marks the task just trained. A method that
+      compounds skill raises the stars while keeping the other curves up.
+    </p>
+    <figure class="figure-wide" id="fig-domain"></figure>
+    <p class="legend">
+      <span><span class="dot" style="background:var(--c-tooluse)"></span>ToolUse</span>
+      <span><span class="dot" style="background:var(--c-finqa)"></span>FinQA</span>
+      <span><span class="dot" style="background:var(--c-bio)"></span>SciKE-Bio</span>
+      <span>★ = just-trained stage</span>
+    </p>
+    <span class="caption">
+      Per-method accuracy across the three-stage chain. SDFT is the
+      only method whose three end-of-chain scores are all above
+      baseline. GEPA's mid-chain FinQA spike (≈ 53 %) is given back
+      almost entirely at the Bio phase. Cartridges and In-place TTT
+      barely move off the base-model row.
+    </span>
+    <div class="insight-bubble">
+      <span class="ib-label">Insight</span>
+      <p>Across disjoint domains, only distillation compounds: SDFT alone
+      ends every stage at or above its zero-shot baseline.</p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ============== SECTION 6: NOISY TEMPORAL DRIFT ============== -->
+  <section id="noisy">
+    <p class="secnum">Five · Time: noisy slow trend</p>
+    <h2>10-K filings, 2015&nbsp;→&nbsp;2020.</h2>
+    <p class="note">
+      We construct a temporal-drift task from SEC 10-K filings spanning
+      2015 to 2020. A 10-K is the detailed annual report a public company
+      files with the SEC on its financial performance. The task is fixed,
+      predict whether a filer's stock moves up or down over the next thirty
+      days, but the underlying market drifts year to year and the signal is
+      weak. We measure whether a method can <em>stay aligned</em> with the
+      slow trend without overfitting to a single year.
+    </p>
+    <figure class="figure-wide" id="fig-finance"></figure>
+    <p class="legend">
+      <span><span class="swatch" style="background:var(--c-past)"></span>past-year avg</span>
+      <span><span class="swatch" style="background:var(--c-future)"></span>future-year avg</span>
+      <span>★ zero-shot baseline</span>
+    </p>
+    <span class="caption">
+      SDFT lifts future-year accuracy from ≈ 0.51 to ≈ 0.63 by 2020.
+      Cartridges holds both halves around 0.55. GRPO's past-year curve
+      drops from 0.65 to 0.42 across the chain: a noisy reward
+      reinforces the wrong answer. GEPA peaks early and bleeds.
+    </span>
+    <div class="insight-bubble">
+      <span class="ib-label">Insight</span>
+      <p>Under a weak, drifting signal, methods anchored to their own past
+      (SDFT, Cartridges) stay aligned; on-policy RL amplifies the noise.</p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ============== SECTION 7: TEMPWIKI ============== -->
+  <section id="discrete">
+    <p class="secnum">Six · Time: discrete updates</p>
+    <h2>When a fact changes, can the model rewrite the right one?</h2>
+    <p class="note">
+      We construct a knowledge-update task from four monthly Wikipedia
+      mirrors spanning November 2025 to February 2026. From each consecutive
+      pair of snapshots we take a <em>drift set</em> of facts whose value
+      changed, and a held-out <em>stable set</em> whose value did not, which
+      gives three chronological slices. A method that learns the change
+      should raise accuracy on the drift set while holding the stable set
+      fixed. One that spreads the update across the whole model raises one
+      and lowers the other, a failure we call <em>catastrophic memorizing</em>.
+    </p>
+    <figure class="figure-wide" id="fig-tempwiki"></figure>
+    <p class="legend">
+      <span><span class="swatch" style="background:var(--ink)"></span>drift F1 (the facts to rewrite)</span>
+      <span><span class="swatch dashed" style="color:var(--gray)"></span>stable F1 (the facts to leave alone)</span>
+      <span style="color:#b8a672">
+        <svg width="14" height="14" viewBox="0 0 14 14" style="display:inline-block;vertical-align:middle;margin-right:0.3em">
+          <path d="M7 0.5 L8.5 5.0 L13.5 5.0 L9.4 8.0 L11.0 12.7 L7 9.8 L3.0 12.7 L4.6 8.0 L0.5 5.0 L5.5 5.0 Z"
+                fill="#b8a672"/>
+        </svg>zero-shot drift baseline (per slice)
+      </span>
+      <span style="color:#b8a672">
+        <svg width="14" height="14" viewBox="0 0 14 14" style="display:inline-block;vertical-align:middle;margin-right:0.3em">
+          <path d="M7 0.5 L8.5 5.0 L13.5 5.0 L9.4 8.0 L11.0 12.7 L7 9.8 L3.0 12.7 L4.6 8.0 L0.5 5.0 L5.5 5.0 Z"
+                fill="none" stroke="#b8a672" stroke-width="1"/>
+        </svg>zero-shot stable baseline
+      </span>
+    </p>
+    <span class="caption">
+      The x-axis is the three chronological slices, one per adjacent pair of
+      the four monthly mirrors. GRPO is the only weight-update method whose
+      drift F1 averages above baseline. SDFT's stable F1 falls from ≈ 0.30 to ≈ 0.17:
+      the same anchoring that wins 10-K loses TempWiki. Cartridges
+      and In-place TTT keep stable F1 flat: locality, which hurt them
+      on domain shift, is the property this regime rewards.
+    </span>
+    <div class="insight-bubble">
+      <span class="ib-label">Insight</span>
+      <p>Only GRPO rewrites a changed fact without erasing the rest; the
+      anchoring that wins the slow trend fails here.</p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ============== SECTION 8: TAKEAWAY ============== -->
+  <section id="takeaway">
+    <p class="secnum">Seven · Takeaway</p>
+    <h2>No single method handles every kind of change.</h2>
+    <p class="pullquote">
+      Continual learning is not a single capability. The kind of change in
+      the data determines which update behaviour succeeds.
+    </p>
+    <p class="note">
+      Across our evaluations we observe a consistent set of tradeoffs.
+      Prompt-based methods fit the current stage quickly but degrade sharply
+      on future ones; distillation-based methods accumulate knowledge stably
+      yet struggle to update outdated facts; context compression improves
+      efficiency without substantially improving the ability to learn new
+      tasks; and online reinforcement learning adapts most effectively to
+      factual change but remains sensitive to noisy reward signals. Because
+      these tradeoffs cut in opposite directions across regimes, no single
+      method in our comparison handles more than one regime well, and a
+      single benchmark number cannot reveal whether a model is continually
+      learning or merely reshuffling what it already knows.
+    </p>
+    <p class="note">
+      Our reframing is simple but important: improving a model's score on a
+      benchmark is not the same as helping a model <em>become more competent
+      as time moves forward</em>, which is the property that matters for
+      practical deployment. Benchmarks reward the first; they largely miss
+      the second.
+    </p>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ============== SECTION 9: WHAT'S NEXT ============== -->
+  <section id="next">
+    <p class="secnum">Eight · What's next</p>
+    <h2>Agentic continual learning.</h2>
+    <p class="note">
+      The Space and Time settings we have studied give us the building
+      blocks to take on the hardest case next: long-horizon agentic tasks,
+      where the two axes combine. Each action conditions the next, and the
+      model must carry a history of interactions forward. Full results are
+      coming soon.
+    </p>
+    <figure class="coming-soon">
+      <span class="cs-badge">Coming soon</span>
+    </figure>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ============== SECTION 9: RELATED WORK ============== -->
+  <section id="related">
+    <p class="secnum">Nine · Related work</p>
+    <h2>Work that informed and inspired us.</h2>
+    <p class="note">
+      A growing body of writing has been circling the same question. A few
+      pieces that shaped our thinking:
+    </p>
+    <ul class="links">
+      <li>
+        <a href="https://jessylin.com/2025/10/20/continual-learning/" target="_blank" rel="noopener">Jessy Lin — Continual learning</a>
+        <span class="src">jessylin.com</span>
+      </li>
+      <li>
+        <a href="https://a16z.com/why-we-need-continual-learning/" target="_blank" rel="noopener">a16z — Why we need continual learning</a>
+        <span class="src">a16z.com</span>
+      </li>
+      <li>
+        <a href="https://continual-learning-bench.com" target="_blank" rel="noopener">Continual Learning Bench — a benchmark</a>
+        <span class="src">continual-learning-bench.com</span>
+      </li>
+      <li>
+        <a href="https://self-distillation.github.io/SDFT" target="_blank" rel="noopener">SDFT — self-distillation fine-tuning</a>
+        <span class="src">self-distillation.github.io</span>
+      </li>
+      <li>
+        <a href="https://x.com/tianle_cai/status/2042459055483207818" target="_blank" rel="noopener">Tianle Cai — on continual learning</a>
+        <span class="src">x.com</span>
+      </li>
+      <li>
+        <a href="https://x.com/carnot_cyclist/status/2041479655035679163" target="_blank" rel="noopener">Ilija Lichkovski — on continual learning</a>
+        <span class="src">x.com</span>
+      </li>
+    </ul>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ============== CITATION ============== -->
+  <section id="cite" class="cite-section">
+    <p class="secnum">Cite this page</p>
+    <div class="codeblock">
+      <button class="copy-btn" type="button" data-copy="cite-bib">Copy</button>
+      <pre id="cite-bib"><code>@misc{harrington2026competence,
+  title        = {Competence Through Change: A Unified View of Continual Learning},
+  author       = {Harrington, Anne and Saxena, Nayan and Murphy, Michael
+                  and Borovykh, Anastasia and Kamath, Sridhar and Kyi, Ara Eindra
+                  and Darrell, Trevor and Malik, Jitendra and Bai, Yutong},
+  year         = {2026},
+  howpublished = {\url{https://anneharrington.github.io/competence-through-change}},
+  note         = {Project page}
+}</code></pre>
+    </div>
+  </section>
+
+</div>
+
+<!-- ============== DATA + RENDERERS ============== -->
+<script id="cl-data" type="application/json">
+{
+  "domain": {
+    "SFT": {
+      "tooluse": [
+        0.5819672131147541,
+        0.6024590163934426,
+        0.5676229508196722,
+        0.5819672131147541
+      ],
+      "finqa": [
+        0.24180327868852458,
+        0.21721311475409835,
+        0.29098360655737704,
+        0.10040983606557377
+      ],
+      "bio": [
+        0.3025,
+        0.2625,
+        0.2775,
+        0.3675
+      ]
+    },
+    "SDFT": {
+      "tooluse": [
+        0.5737704918032787,
+        0.6434426229508197,
+        0.6331967213114754,
+        0.6168032786885246
+      ],
+      "finqa": [
+        0.23565573770491804,
+        0.2766393442622951,
+        0.6967213114754098,
+        0.6844262295081968
+      ],
+      "bio": [
+        0.3025,
+        0.35,
+        0.29,
+        0.4325
+      ]
+    },
+    "SDPO": {
+      "tooluse": [
+        0.5819672131147541,
+        0.6525735294117647,
+        0.6470588235294118,
+        0.6415441176470589
+      ],
+      "finqa": [
+        0.24180327868852458,
+        0.29822834645669294,
+        0.6299212598425197,
+        0.5738188976377953
+      ],
+      "bio": [
+        0.3025,
+        0.3475,
+        0.3375,
+        0.5325
+      ]
+    },
+    "GRPO": {
+      "tooluse": [
+        0.5790441176470589,
+        0.6746323529411765,
+        0.6819852941176471,
+        0.5036764705882353
+      ],
+      "finqa": [
+        0.2559055118110236,
+        0.2618110236220472,
+        0.6584645669291339,
+        0.656496062992126
+      ],
+      "bio": [
+        0.3375,
+        0.3575,
+        0.29,
+        0.5
+      ]
+    },
+    "GEPA": {
+      "tooluse": [
+        0.544,
+        0.559,
+        0.5665,
+        0.574
+      ],
+      "finqa": [
+        0.227,
+        0.227,
+        0.531,
+        0.273
+      ],
+      "bio": [
+        0.32,
+        0.32,
+        0.32,
+        0.36
+      ]
+    },
+    "ACE": {
+      "tooluse": [
+        0.544,
+        0.515,
+        0.522,
+        0.529
+      ],
+      "finqa": [
+        0.227,
+        0.227,
+        0.445,
+        0.352
+      ],
+      "bio": [
+        0.32,
+        0.32,
+        0.32,
+        0.38
+      ]
+    },
+    "Cartridges": {
+      "tooluse": [
+        0.5819672131147541,
+        0.5422794117647058,
+        0.5422794117647058,
+        0.5698529411764706
+      ],
+      "finqa": [
+        0.24180327868852458,
+        0.2431640625,
+        0.212890625,
+        0.1728515625
+      ],
+      "bio": [
+        0.3025,
+        0.32,
+        0.275,
+        0.265
+      ]
+    },
+    "In-Place TTT": {
+      "tooluse": [
+        0.5819672131147541,
+        0.5165441176470589,
+        0.4485294117647059,
+        0.31066176470588236
+      ],
+      "finqa": [
+        0.24180327868852458,
+        0.2451171875,
+        0.240234375,
+        0.2158203125
+      ],
+      "bio": [
+        0.3025,
+        0.2975,
+        0.2725,
+        0.3425
+      ]
+    }
+  },
+  "domain_stages": [
+    "base",
+    "+ToolUse",
+    "+FinQA",
+    "+Bio"
+  ],
+  "domain_tasks": [
+    "tooluse",
+    "finqa",
+    "bio"
+  ],
+  "domain_task_labels": {
+    "tooluse": "ToolUse",
+    "finqa": "FinQA",
+    "bio": "SciKE-Bio"
+  },
+  "finance": {
+    "SFT": {
+      "baseline": [
+        0.55,
+        0.4275,
+        0.505,
+        0.5775,
+        0.425,
+        0.6175
+      ],
+      "past": [
+        0.48,
+        0.49750000000000005,
+        0.5033333333333333,
+        0.5175000000000001,
+        0.5025,
+        0.5358333333333333
+      ],
+      "future": [
+        0.48900000000000005,
+        0.47812499999999997,
+        0.4791666666666667,
+        0.57125,
+        0.455,
+        null
+      ]
+    },
+    "SDFT": {
+      "baseline": [
+        0.5475,
+        0.43,
+        0.525,
+        0.58,
+        0.4175,
+        0.62
+      ],
+      "past": [
+        0.5325,
+        0.47875,
+        0.49500000000000005,
+        0.515,
+        0.49349999999999994,
+        0.5158333333333334
+      ],
+      "future": [
+        0.5145,
+        0.535625,
+        0.5383333333333333,
+        0.5225,
+        0.63,
+        null
+      ]
+    },
+    "SDPO": {
+      "baseline": [
+        0.5475,
+        0.4275,
+        0.5125,
+        0.585,
+        0.41,
+        0.6175
+      ],
+      "past": [
+        0.2525,
+        0.43625,
+        0.455,
+        0.41125,
+        0.44299999999999995,
+        0.4679166666666667
+      ],
+      "future": [
+        0.316,
+        0.44125,
+        0.4533333333333333,
+        0.44875,
+        0.58,
+        null
+      ]
+    },
+    "GRPO": {
+      "baseline": [
+        0.57,
+        0.4175,
+        0.5225,
+        0.5775,
+        0.43,
+        0.615
+      ],
+      "past": [
+        0.645,
+        0.51,
+        0.46666666666666673,
+        0.43500000000000005,
+        0.45600000000000007,
+        0.42333333333333334
+      ],
+      "future": [
+        0.5469999999999999,
+        0.38,
+        0.38000000000000006,
+        0.4,
+        0.26,
+        null
+      ]
+    },
+    "GEPA": {
+      "baseline": [
+        0.55,
+        0.43,
+        0.52,
+        0.58,
+        0.42,
+        0.62
+      ],
+      "past": [
+        0.58,
+        0.62,
+        0.54,
+        0.52,
+        0.48,
+        0.44
+      ],
+      "future": [
+        0.52,
+        0.56,
+        0.52,
+        0.52,
+        0.48,
+        null
+      ]
+    },
+    "ACE": {
+      "baseline": [
+        0.55,
+        0.43,
+        0.52,
+        0.58,
+        0.42,
+        0.62
+      ],
+      "past": [
+        0.56,
+        0.5,
+        0.54,
+        0.6,
+        0.5,
+        0.58
+      ],
+      "future": [
+        0.6,
+        0.46,
+        0.5,
+        0.62,
+        0.48,
+        null
+      ]
+    },
+    "Cartridges": {
+      "baseline": [
+        0.55,
+        0.4275,
+        0.505,
+        0.5775,
+        0.425,
+        0.6175
+      ],
+      "past": [
+        0.5925,
+        0.48624999999999996,
+        0.47500000000000003,
+        0.565,
+        0.502,
+        0.5291666666666667
+      ],
+      "future": [
+        0.529,
+        0.563125,
+        0.5516666666666666,
+        0.55625,
+        0.5825,
+        null
+      ]
+    },
+    "In-Place TTT": {
+      "baseline": [
+        0.55,
+        0.4275,
+        0.505,
+        0.5775,
+        0.425,
+        0.6175
+      ],
+      "past": [
+        0.505,
+        0.47625,
+        0.5041666666666667,
+        0.5,
+        0.4665,
+        0.48500000000000004
+      ],
+      "future": [
+        0.46950000000000003,
+        0.48875,
+        0.46833333333333327,
+        0.43499999999999994,
+        0.5125,
+        null
+      ]
+    }
+  },
+  "finance_years": [
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020
+  ],
+  "tempwiki": {
+    "SFT": {
+      "baseline": [
+        0.1375,
+        0.0375,
+        0.1225
+      ],
+      "past": [
+        0.095,
+        0.0625,
+        0.0625
+      ],
+      "future": [
+        0.06625,
+        0.0825,
+        null
+      ],
+      "stable": [
+        0.285,
+        0.3125,
+        0.3275
+      ],
+      "drift": [
+        0.095,
+        0.045,
+        0.0825
+      ]
+    },
+    "SDFT": {
+      "baseline": [
+        0.145,
+        0.0375,
+        0.125
+      ],
+      "past": [
+        0.105,
+        0.04875,
+        0.055
+      ],
+      "future": [
+        0.07875,
+        0.095,
+        null
+      ],
+      "stable": [
+        0.2975,
+        0.2775,
+        0.1675
+      ],
+      "drift": [
+        0.105,
+        0.0225,
+        0.08
+      ]
+    },
+    "SDPO": {
+      "baseline": [
+        0.155,
+        0.035,
+        0.1225
+      ],
+      "past": [
+        0.155,
+        0.10375000000000001,
+        0.051666666666666666
+      ],
+      "future": [
+        0.08750000000000001,
+        0.145,
+        null
+      ],
+      "stable": [
+        0.33,
+        0.3425,
+        0.1275
+      ],
+      "drift": [
+        0.155,
+        0.08,
+        0.085
+      ]
+    },
+    "GRPO": {
+      "baseline": [
+        0.1475,
+        0.0325,
+        0.1275
+      ],
+      "past": [
+        0.115,
+        0.12,
+        0.1225
+      ],
+      "future": [
+        0.06,
+        0.1375,
+        null
+      ],
+      "stable": [
+        0.32,
+        0.345,
+        0.3825
+      ],
+      "drift": [
+        0.115,
+        0.08,
+        0.1525
+      ]
+    },
+    "GEPA": {
+      "baseline": [
+        0.1,
+        0.06,
+        0.15
+      ],
+      "past": [
+        0.18,
+        0.12,
+        0.24
+      ],
+      "future": [
+        0.12,
+        0.08,
+        null
+      ],
+      "stable": [
+        0.32,
+        0.38,
+        0.26
+      ],
+      "drift": [
+        0.18,
+        0.12,
+        0.24
+      ]
+    },
+    "ACE": {
+      "baseline": [
+        0.1,
+        0.06,
+        0.15
+      ],
+      "past": [
+        0.08,
+        0.04,
+        0.06
+      ],
+      "future": [
+        0.08,
+        0.04,
+        null
+      ],
+      "stable": [
+        0.32,
+        0.28,
+        0.32
+      ],
+      "drift": [
+        0.08,
+        0.04,
+        0.06
+      ]
+    },
+    "Cartridges": {
+      "baseline": [
+        0.1375,
+        0.0375,
+        0.1225
+      ],
+      "past": [
+        0.085,
+        0.06125,
+        0.08666666666666667
+      ],
+      "future": [
+        0.09125,
+        0.14,
+        null
+      ],
+      "stable": [
+        0.2825,
+        0.295,
+        0.295
+      ],
+      "drift": [
+        0.085,
+        0.07,
+        0.1175
+      ]
+    },
+    "In-Place TTT": {
+      "baseline": [
+        0.1375,
+        0.0375,
+        0.1225
+      ],
+      "past": [
+        0.1375,
+        0.0925,
+        0.11583333333333334
+      ],
+      "future": [
+        0.09,
+        0.135,
+        null
+      ],
+      "stable": [
+        0.3325,
+        0.3225,
+        0.345
+      ],
+      "drift": [
+        0.1375,
+        0.06,
+        0.1475
+      ]
+    }
+  },
+  "tempwiki_slices": [
+    "s1",
+    "s2",
+    "s3"
+  ],
+  "tempwiki_stable_baseline": 0.305
+}
+</script>
+<script>
+const D = JSON.parse(document.getElementById('cl-data').textContent);
+
+/* Reveal sections on scroll — fires when the section heading hits
+   the viewport. Pure opacity fade. */
+if ('IntersectionObserver' in window) {
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in-view');
+        sectionObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0, rootMargin: '0px 0px 0px 0px' });
+  document.querySelectorAll('section').forEach(el => sectionObserver.observe(el));
+
+  /* Per-figure observer — each plot's curve draw-in is scoped to
+     when THAT plot enters view, not when the section heading does.
+     rootMargin: -15% bottom means we wait until the figure is 15%
+     of viewport height in from the bottom before firing — so the
+     user is already looking at the panel when the curve starts
+     drawing. */
+  const figureObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('revealed');
+        figureObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0, rootMargin: '0px 0px -15% 0px' });
+  document.querySelectorAll('figure.figure-wide').forEach(el => figureObserver.observe(el));
+} else {
+  document.querySelectorAll('section').forEach(el => el.classList.add('in-view'));
+  document.querySelectorAll('figure.figure-wide').forEach(el => el.classList.add('revealed'));
+}
+const NS='http://www.w3.org/2000/svg';
+const C={
+  ink:'#14181f', faint:'#ccd5e2', grid:'#e7ecf3', gray:'#586273',
+  red:'#c2410c', signature:'#1d4ed8', paper:'#ffffff',
+  space:'#1d4ed8', time:'#0e7490',
+  tooluse:'#2563eb', finqa:'#db2777', bio:'#0e7490',
+  past:'#2563eb', future:'#db2777', base:'#9b8847'
+};
+function el(t,a={}){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+function svg(w,h){return el('svg',{viewBox:`0 0 ${w} ${h}`,preserveAspectRatio:'xMidYMid meet'});}
+function txt(parent,x,y,str,cls='axis-text',anchor='start',fill=null){
+  const e=el('text',{x,y,'text-anchor':anchor,class:cls}); if(fill) e.setAttribute('fill',fill);
+  e.textContent=str; parent.appendChild(e); return e;
+}
+const PATH = (xy)=> xy.map((p,i)=>(i?'L':'M')+p[0].toFixed(2)+' '+p[1].toFixed(2)).join(' ');
+
+// 5-point star as a proper SVG path. Consistent rendering across
+// browsers (unlike Unicode ★ which depends on system fonts), and
+// gives us precise control over weight + colour.
+function starPath(cx, cy, r){
+  let d = '';
+  for (let i = 0; i < 10; i++) {
+    const a = (Math.PI * 2 * i / 10) - Math.PI / 2;
+    const rr = (i % 2 === 0) ? r : r * 0.40;
+    const x = cx + rr * Math.cos(a);
+    const y = cy + rr * Math.sin(a);
+    d += (i ? 'L' : 'M') + x.toFixed(2) + ' ' + y.toFixed(2) + ' ';
+  }
+  return d + 'Z';
+}
+
+// Annotation colour for baselines — muted warm gold. Lighter than
+// the ink data so the baselines layer BEHIND the curves visually
+// (per design.md: annotations even lighter than secondary data).
+const BASELINE_GOLD = '#b8a672';
+
+// shared sans family — matches plot panel-titles / axis labels
+const SANS = '"Source Serif 4", Georgia, serif';
+
+/* ============================================================
+   GENERIC PANEL HELPERS
+   ============================================================ */
+function rangeFrame(s, x0, y0, x1, y1, color){
+  s.appendChild(el('line',{x1:x0,y1:y0,x2:x0,y2:y1,stroke:color||C.gray,'stroke-width':1}));
+}
+function xAxisLine(s, x0, x1, y, color){
+  s.appendChild(el('line',{x1:x0,y1:y,x2:x1,y2:y,stroke:color||C.gray,'stroke-width':1}));
+}
+function yTicks(s, x, ys, Y, fmt, color){
+  ys.forEach(v=>{
+    s.appendChild(el('line',{x1:x-3,y1:Y(v),x2:x,y2:Y(v),stroke:color||C.gray,'stroke-width':0.8}));
+    txt(s,x-7,Y(v)+3,fmt(v),'axis-num','end');
+  });
+}
+
+/* ============================================================
+   FIG: DOMAIN SHIFT — 8 panels, 4 cols x 2 rows
+   ============================================================ */
+(function(){
+  const cols=4, rows=2, pw=210, ph=170, gx=20, gy=46, padL=58, padT=22, padR=8;
+  const W=padL+cols*pw+(cols-1)*gx+padR;
+  const H=padT+rows*ph+(rows-1)*gy+30;
+  const s=svg(W,H); s.setAttribute('width','100%');
+
+  const methods=['SFT','SDFT','SDPO','GRPO','GEPA','ACE','Cartridges','In-Place TTT'];
+  const stages=D.domain_stages;
+  const xLabels=stages.map(s=>s==='base'?'base':s);
+  const yMin=0.0, yMax=0.80;
+
+  methods.forEach((m,k)=>{
+    const cx=padL+(k%cols)*(pw+gx);
+    const cy=padT+Math.floor(k/cols)*(ph+gy);
+    const X=i=>cx+10+i/(stages.length-1)*(pw-20);
+    const Y=v=>cy+ph-(v-yMin)/(yMax-yMin)*ph;
+
+    // title
+    txt(s,cx,cy-6,m,'panel-title');
+
+    // range-frame y-axis on left column
+    if(k%cols===0){
+      rangeFrame(s,cx-2,Y(yMax),cx-2,Y(yMin));
+      yTicks(s,cx-2,[0.0,0.2,0.4,0.6,0.8],Y,v=>Math.round(v*100));
+      const yt=el('text',{x:cx-44,y:cy+ph/2,'text-anchor':'middle',class:'axis-text'});
+      yt.setAttribute('transform',`rotate(-90 ${cx-44} ${cy+ph/2})`);
+      yt.textContent='Accuracy (%)'; s.appendChild(yt);
+    }
+    // x-axis baseline
+    xAxisLine(s,cx-2,cx+pw,cy+ph);
+    // x labels
+    stages.forEach((st,i)=>txt(s,X(i),cy+ph+14,st,'axis-num','middle'));
+
+    // phase boundaries (faint)
+    for(let i=1;i<stages.length-1;i++){
+      s.appendChild(el('line',{x1:X(i+0.5),y1:cy+8,x2:X(i+0.5),y2:cy+ph,
+        stroke:C.faint,'stroke-width':1,'stroke-dasharray':'2 4'}));
+    }
+
+    // three curves
+    const tasks=['tooluse','finqa','bio'];
+    const ownStage={'tooluse':1,'finqa':2,'bio':3};
+    tasks.forEach(task=>{
+      const data=D.domain[m][task];
+      const pts=data.map((v,i)=>v==null?null:[X(i),Y(v)]).filter(Boolean);
+      const xy=data.map((v,i)=>v==null?null:[X(i),Y(v)]);
+      // line
+      const line=[];
+      data.forEach((v,i)=>{if(v!=null) line.push([X(i),Y(v)]);});
+      if(line.length>=2)
+        s.appendChild(el('path',{d:PATH(line),fill:'none',
+          stroke:C['tooluse']&&task==='tooluse'?C.tooluse:(task==='finqa'?C.finqa:C.bio),
+          'stroke-width':1.8, class:'curve'}));
+      // points
+      data.forEach((v,i)=>{
+        if(v==null) return;
+        const own=(ownStage[task]===i);
+        if(own){
+          s.appendChild(el('circle',{cx:X(i),cy:Y(v),r:4.5, class:'point',
+            fill:task==='tooluse'?C.tooluse:(task==='finqa'?C.finqa:C.bio),
+            stroke:C.paper,'stroke-width':1.5}));
+        } else {
+          s.appendChild(el('circle',{cx:X(i),cy:Y(v),r:2.6, class:'point',
+            fill:C.paper,stroke:task==='tooluse'?C.tooluse:(task==='finqa'?C.finqa:C.bio),'stroke-width':1.4}));
+        }
+      });
+    });
+  });
+  document.getElementById('fig-domain').appendChild(s);
+})();
+
+/* ============================================================
+   FIG: FINANCE 10-K — 8 panels with past/future curves + baseline ★
+   ============================================================ */
+(function(){
+  const cols=4, rows=2, pw=210, ph=170, gx=20, gy=46, padL=58, padT=22, padR=8;
+  const W=padL+cols*pw+(cols-1)*gx+padR;
+  const H=padT+rows*ph+(rows-1)*gy+34;
+  const s=svg(W,H); s.setAttribute('width','100%');
+
+  const methods=['SFT','SDFT','SDPO','GRPO','GEPA','ACE','Cartridges','In-Place TTT'];
+  const years=D.finance_years;
+  const yMin=0.20, yMax=0.75;
+
+  methods.forEach((m,k)=>{
+    const cx=padL+(k%cols)*(pw+gx);
+    const cy=padT+Math.floor(k/cols)*(ph+gy);
+    const X=i=>cx+10+i/(years.length-1)*(pw-20);
+    const Y=v=>cy+ph-(v-yMin)/(yMax-yMin)*ph;
+
+    txt(s,cx,cy-6,m,'panel-title');
+
+    if(k%cols===0){
+      rangeFrame(s,cx-2,Y(yMax),cx-2,Y(yMin));
+      yTicks(s,cx-2,[0.30,0.50,0.70],Y,v=>v.toFixed(2));
+      const yt=el('text',{x:cx-44,y:cy+ph/2,'text-anchor':'middle',class:'axis-text'});
+      yt.setAttribute('transform',`rotate(-90 ${cx-44} ${cy+ph/2})`);
+      yt.textContent='Accuracy'; s.appendChild(yt);
+    }
+    xAxisLine(s,cx-2,cx+pw,cy+ph);
+    // x labels: first + last + maybe middle
+    txt(s,X(0),cy+ph+14,String(years[0]),'axis-num','middle');
+    txt(s,X(years.length-1),cy+ph+14,String(years[years.length-1]),'axis-num','middle');
+
+    // 0.5 reference (faint)
+    s.appendChild(el('line',{x1:cx,y1:Y(0.5),x2:cx+pw,y2:Y(0.5),
+      stroke:C.faint,'stroke-width':0.8,'stroke-dasharray':'1 3'}));
+
+    const d=D.finance[m]; if(!d) return;
+    // past curve (blue)
+    const pastPts=d.past.map((v,i)=>v==null?null:[X(i),Y(v)]).filter(Boolean);
+    if(pastPts.length>=2)
+      s.appendChild(el('path',{d:PATH(pastPts),fill:'none',stroke:C.past,'stroke-width':1.8,class:'curve'}));
+    // future curve (red)
+    const futPts=d.future.map((v,i)=>v==null?null:[X(i),Y(v)]).filter(Boolean);
+    if(futPts.length>=2)
+      s.appendChild(el('path',{d:PATH(futPts),fill:'none',stroke:C.future,'stroke-width':1.8,class:'curve'}));
+    // points
+    d.past.forEach((v,i)=>{if(v!=null) s.appendChild(el('circle',{cx:X(i),cy:Y(v),r:2.4,class:'point',
+      fill:C.paper,stroke:C.past,'stroke-width':1.3}));});
+    d.future.forEach((v,i)=>{if(v!=null) s.appendChild(el('circle',{cx:X(i),cy:Y(v),r:2.4,class:'point',
+      fill:C.paper,stroke:C.future,'stroke-width':1.3}));});
+    // Baseline ★ as a proper SVG path — small, muted gold, precisely
+    // centred. Renders identically on every browser.
+    d.baseline.forEach((v,i)=>{
+      if(v==null) return;
+      s.appendChild(el('path',{d: starPath(X(i), Y(v), 4.2),
+        fill: BASELINE_GOLD, class:'star'}));
+    });
+  });
+  document.getElementById('fig-finance').appendChild(s);
+})();
+
+/* ============================================================
+   FIG: TEMPWIKI — 8 panels with drift / stable F1
+   ============================================================ */
+(function(){
+  const cols=4, rows=2, pw=210, ph=170, gx=20, gy=46, padL=58, padT=22, padR=8;
+  const W=padL+cols*pw+(cols-1)*gx+padR;
+  const H=padT+rows*ph+(rows-1)*gy+34;
+  const s=svg(W,H); s.setAttribute('width','100%');
+
+  const methods=['SFT','SDFT','SDPO','GRPO','GEPA','ACE','Cartridges','In-Place TTT'];
+  const slices=D.tempwiki_slices;
+  const yMin=0.0, yMax=0.45;
+
+  methods.forEach((m,k)=>{
+    const cx=padL+(k%cols)*(pw+gx);
+    const cy=padT+Math.floor(k/cols)*(ph+gy);
+    const X=i=>cx+18+i/(slices.length-1)*(pw-36);
+    const Y=v=>cy+ph-(v-yMin)/(yMax-yMin)*ph;
+
+    txt(s,cx,cy-6,m,'panel-title');
+
+    if(k%cols===0){
+      rangeFrame(s,cx-2,Y(yMax),cx-2,Y(yMin));
+      yTicks(s,cx-2,[0.0,0.15,0.30,0.45],Y,v=>v.toFixed(2));
+      const yt=el('text',{x:cx-44,y:cy+ph/2,'text-anchor':'middle',class:'axis-text'});
+      yt.setAttribute('transform',`rotate(-90 ${cx-44} ${cy+ph/2})`);
+      yt.textContent='F1 (object)'; s.appendChild(yt);
+    }
+    xAxisLine(s,cx-2,cx+pw,cy+ph);
+    slices.forEach((sl,i)=>txt(s,X(i),cy+ph+14,String(i+1),'axis-num','middle'));
+
+    const d=D.tempwiki[m]; if(!d) return;
+    // drift (solid ink)
+    const dPts=d.drift.map((v,i)=>v==null?null:[X(i),Y(v)]).filter(Boolean);
+    if(dPts.length>=2)
+      s.appendChild(el('path',{d:PATH(dPts),fill:'none',stroke:C.ink,'stroke-width':2,class:'curve'}));
+    d.drift.forEach((v,i)=>{if(v!=null) s.appendChild(el('circle',{cx:X(i),cy:Y(v),r:3,fill:C.ink,class:'point'}));});
+
+    // stable (gray dashed)
+    const sPts=d.stable.map((v,i)=>v==null?null:[X(i),Y(v)]).filter(Boolean);
+    if(sPts.length>=2)
+      s.appendChild(el('path',{d:PATH(sPts),fill:'none',stroke:C.gray,'stroke-width':1.4,'stroke-dasharray':'3 3',class:'curve'}));
+    d.stable.forEach((v,i)=>{if(v!=null) s.appendChild(el('circle',{cx:X(i),cy:Y(v),r:2.2,fill:C.paper,stroke:C.gray,'stroke-width':1.3,class:'point'}));});
+
+    // ★ Per-slice DRIFT baseline (filled muted gold).
+    d.baseline.forEach((v,i)=>{
+      if(v==null) return;
+      s.appendChild(el('path',{d: starPath(X(i), Y(v), 4.2),
+        fill: BASELINE_GOLD, class:'star'}));
+    });
+
+    // ★ STABLE baseline — single scalar SFT zero-shot stable F1
+    // drawn as outline stars across all slices. Outline vs. filled
+    // gives a clean visual distinction from the drift baseline
+    // (same colour, lower visual weight — layered behind).
+    const sb = D.tempwiki_stable_baseline;
+    if (sb != null) {
+      slices.forEach((sl,i)=>{
+        s.appendChild(el('path',{d: starPath(X(i), Y(sb), 3.8),
+          fill:'none', stroke: BASELINE_GOLD, 'stroke-width': 1, class:'star'}));
+      });
+    }
+  });
+  const xt=el('text',{x:padL+(cols*pw+(cols-1)*gx)/2, y:H-6,
+    'text-anchor':'middle', class:'axis-text'});
+  xt.textContent='Chronological slice (Nov 2025 → Feb 2026)';
+  s.appendChild(xt);
+  document.getElementById('fig-tempwiki').appendChild(s);
+})();
+
+/* Copy-to-clipboard for citation blocks */
+document.querySelectorAll('.copy-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var el = document.getElementById(btn.getAttribute('data-copy'));
+    if (!el) return;
+    navigator.clipboard.writeText(el.innerText).then(function(){
+      var prev = btn.textContent;
+      btn.textContent = 'Copied'; btn.classList.add('copied');
+      setTimeout(function(){ btn.textContent = prev; btn.classList.remove('copied'); }, 1600);
+    });
+  });
+});
+
+/* TOC drawer toggle (mobile / narrow screens) */
+(function(){
+  var btn = document.querySelector('.toc-toggle');
+  var backdrop = document.querySelector('.toc-backdrop');
+  if (!btn) return;
+  function close(){ document.body.classList.remove('toc-open'); btn.setAttribute('aria-expanded','false'); }
+  btn.addEventListener('click', function(){
+    var open = document.body.classList.toggle('toc-open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  if (backdrop) backdrop.addEventListener('click', close);
+  document.querySelectorAll('.toc a').forEach(function(a){ a.addEventListener('click', close); });
+})();
+
+/* TOC scroll-spy: highlight the section currently in view */
+(function(){
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  if (!links.length) return;
+  var map = {};
+  links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+  var sections = Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (e.isIntersecting) {
+        links.forEach(function(a){ a.classList.remove('active'); });
+        if (map[e.target.id]) map[e.target.id].classList.add('active');
+      }
+    });
+  }, { rootMargin: '-25% 0px -65% 0px', threshold: 0 });
+  sections.forEach(function(s){ obs.observe(s); });
+})();
+</script>
 </body>
 </html>
