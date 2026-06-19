@@ -34,7 +34,7 @@
     --sans:    "Source Serif 4", Georgia, serif;
   }
   * { box-sizing: border-box; }
-  html { font-size: 14px; -webkit-text-size-adjust: 100%; }
+  html { font-size: clamp(10px, 0.53vw + 8px, 14px); -webkit-text-size-adjust: 100%; }
   body {
     background: var(--paper); color: var(--ink);
     font-family: var(--body); font-weight: 400;
@@ -99,13 +99,13 @@
   }
   h1 {
     font-family: var(--display); font-weight: 600;
-    font-size: clamp(2.17rem, 3.2vw, 3.43rem);
-    line-height: 1.15; letter-spacing: -0.005em;
+    font-size: 3rem;
+    line-height: 1.12; letter-spacing: -0.005em;
     margin: 0 0 1.8rem; max-width: none;
   }
   .standfirst {
     font-family: var(--body); font-weight: 400; color: var(--gray);
-    font-size: 1.35rem; line-height: 1.5; max-width: var(--measure); margin: 0;
+    font-size: 1.2rem; line-height: 1.55; max-width: var(--measure); margin: 0;
   }
   .authors {
     font-family: var(--sans); font-size: 0.98rem; font-weight: 500;
@@ -226,16 +226,16 @@
   .copy-btn.copied { background: var(--signature); color: #fff; border-color: var(--signature); }
 
   /* ── Related-work links ────────────────────────────────────────── */
-  ul.links { list-style: none; padding: 0; margin: 1.4rem 0 0; max-width: var(--measure); }
+  ul.links { list-style: none; padding: 0; margin: 1rem 0 0; max-width: var(--measure); }
   ul.links li {
     display: flex; justify-content: space-between; align-items: baseline; gap: 1.2rem;
-    padding: 0.75rem 0; border-bottom: 1px solid var(--grid);
+    padding: 0.42rem 0; border-bottom: 1px solid var(--grid);
   }
   ul.links li:first-child { border-top: 1px solid var(--grid); }
-  ul.links a { color: var(--ink); text-decoration: none; font-size: 1.05rem; }
+  ul.links a { color: var(--ink); text-decoration: none; font-size: 0.92rem; }
   ul.links a:hover { color: var(--signature); text-decoration: underline; }
   ul.links .src {
-    font-family: var(--sans); font-size: 0.82rem; color: var(--gray);
+    font-family: var(--sans); font-size: 0.76rem; color: var(--gray);
     white-space: nowrap; flex: none;
   }
 
@@ -427,7 +427,7 @@
 
   <!-- ============== MASTHEAD ============== -->
   <header class="masthead">
-    <h1>Studying Learning in Continual Learning</h1>
+    <h1>Studying Learning in&nbsp;Continual&nbsp;Learning</h1>
     <p class="standfirst">An overview of our project on continual learning in large language models. Methods for continual learning (prompting, fine-tuning, reinforcement learning, and context compression) are usually studied in isolation. We propose a framework that lets us evaluate them together on the same sequential benchmarks, and ask one question: <em>when does continual learning require learning?</em></p>
     <p class="authors">
       <span class="name">Anne Harrington<sup>1*</sup></span><span class="sep">·</span>
