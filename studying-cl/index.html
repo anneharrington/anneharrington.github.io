@@ -633,6 +633,12 @@
       almost entirely at the Bio phase. Cartridges and In-place TTT
       barely move off the base-model row.
     </span>
+    <p class="note" style="font-size:0.88rem; color:var(--gray); margin-top:0.7rem;">
+      Our sequential skill-learning protocol follows closely that of
+      <a href="https://arxiv.org/abs/2601.19897" target="_blank" rel="noopener">Shenfeld et&nbsp;al. (2026)</a>,
+      who introduced it to study SDFT. We modify the task sets and evaluate
+      all eight methods under it rather than SDFT alone.
+    </p>
     <div class="insight-bubble">
       <span class="ib-label">Insight</span>
       <p>Across disjoint domains, only distillation compounds: SDFT alone
@@ -715,6 +721,12 @@
       and In-place TTT keep stable F1 flat: locality, which hurt them
       on domain shift, is the property this regime rewards.
     </span>
+    <p class="note" style="font-size:0.88rem; color:var(--gray); margin-top:0.7rem;">
+      The knowledge-update protocol likewise follows
+      <a href="https://arxiv.org/abs/2601.19897" target="_blank" rel="noopener">Shenfeld et&nbsp;al. (2026)</a>.
+      We build our own monthly Wikipedia mirrors and, as above, compare all
+      eight methods rather than SDFT alone.
+    </p>
     <div class="insight-bubble">
       <span class="ib-label">Insight</span>
       <p>Only GRPO rewrites a changed fact without erasing the rest; the
