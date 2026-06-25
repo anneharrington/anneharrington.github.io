@@ -115,6 +115,21 @@
   .authors .sep { color: var(--faint); margin: 0 0.55em; font-weight: 400; }
   .authors .name { white-space: nowrap; }
   .authors .name sup { font-size: 0.66em; color: var(--signature); font-weight: 600; margin-left: 1px; }
+  .res-links { margin: 1.5rem 0 0; display: flex; gap: 0.65rem; flex-wrap: wrap; }
+  .res-btn {
+    display: inline-flex; align-items: center; gap: 0.5em;
+    font-family: var(--sans); font-size: 0.9rem; font-weight: 600;
+    color: var(--gray); background: #fff;
+    border: 1px solid var(--grid); border-radius: 8px;
+    padding: 0.45em 0.85em; cursor: default; user-select: none;
+  }
+  .res-btn svg { display: inline-block; flex: none; }
+  .res-btn .soon-tag {
+    font-size: 0.62rem; font-weight: 600; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--signature);
+    background: #e7eefe; padding: 0.2em 0.5em; border-radius: 999px;
+    white-space: nowrap;
+  }
   .affiliations {
     font-family: var(--sans); font-size: 0.84rem; color: var(--gray);
     margin: 0.7rem 0 0; line-height: 1.6; max-width: var(--measure);
@@ -466,6 +481,16 @@
       <sup>1</sup>UC Berkeley<span class="sep">·</span>
       <sup>2</sup>Independent<span class="sep">·</span>
       <sup>3</sup>Capital Fund Management
+    </p>
+    <p class="res-links">
+      <span class="res-btn" role="button" aria-disabled="true" title="arXiv (coming soon)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        arXiv<span class="soon-tag">coming soon</span>
+      </span>
+      <span class="res-btn" role="button" aria-disabled="true" title="Code (coming soon)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        Code<span class="soon-tag">coming soon</span>
+      </span>
     </p>
   </header>
 
