@@ -138,6 +138,18 @@
     margin: 0 0 1.6rem;
   }
   .note em { font-style: italic; }
+  .task-list {
+    max-width: var(--measure); margin: -0.6rem 0 1.5rem;
+    padding-left: 1.2rem; list-style: none;
+  }
+  .task-list li {
+    position: relative; color: var(--ink); font-size: 1.05rem;
+    line-height: 1.55; padding: 0.22rem 0;
+  }
+  .task-list li::before {
+    content: "—"; position: absolute; left: -1.2rem; color: var(--gray);
+  }
+  .task-list strong { font-weight: 600; }
   .pullquote {
     font-family: var(--display); font-style: italic;
     font-size: 1.5rem; line-height: 1.35; color: var(--ink);
@@ -334,10 +346,18 @@
   table.spark.rec { width: auto; max-width: 100%; }
   table.spark.rec th:nth-child(n+2), table.spark.rec td:nth-child(n+2) { text-align: center; padding: 0.55rem 0.9em; }
   table.spark.rec .na { color: var(--faint); }
+  table.spark.rec .rec-soon {
+    font-family: var(--sans); font-size: 0.72rem; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--signature);
+  }
+  table.spark.rec .rec-soon-row td:first-child { color: var(--gray); }
   table.spark.methods { width: auto; max-width: 100%; }
   table.spark.methods td:nth-child(3) { padding-right: 2.4em; }
+  table.spark.sw { width: 100%; max-width: var(--measure); margin: 1.2rem auto 1.8rem; }
+  table.spark.sw td { font-size: 0.96rem; vertical-align: top; }
+  table.spark.sw td.m { font-weight: 600; white-space: nowrap; padding-right: 1.6em; }
 
-  .teaser { max-width: calc(var(--measure) * 0.76); margin: 0.4rem auto 1.2rem; }
+  .teaser { max-width: var(--measure); margin: 0.4rem auto 1.2rem; }
   .teaser img { width: 100%; height: auto; display: block; }
 
   .figure-wide { margin: 0 auto 1rem; max-width: var(--measure); }
@@ -414,8 +434,8 @@
     <li><a href="#framing">Framing</a></li>
     <li><a href="#framework">Methods Overview</a></li>
     <li><a href="#domain">Domain Shift</a></li>
-    <li><a href="#noisy">Noisy Drift</a></li>
     <li><a href="#discrete">Discrete Updates</a></li>
+    <li><a href="#noisy">Noisy Drift</a></li>
     <li><a href="#takeaway">Takeaway</a></li>
     <li><a href="#next">What's Next</a></li>
     <li><a href="#related">Related Work</a></li>
@@ -428,12 +448,13 @@
   <!-- ============== MASTHEAD ============== -->
   <header class="masthead">
     <h1>Studying Learning in&nbsp;Continual&nbsp;Learning</h1>
-    <p class="standfirst">An overview of our project on continual learning in large language models. Methods for continual learning (prompting, fine-tuning, reinforcement learning, and context compression) are usually studied in isolation. We propose a framework that lets us evaluate them together on the same sequential benchmarks, and ask one question: <em>when does continual learning require learning?</em></p>
+    <p class="standfirst"><em>When does continual learning require learning?</em> Methods for continual learning in large language models (prompting, fine-tuning, reinforcement learning, and context compression) are usually studied in isolation. We propose a framework that lets us evaluate them together on the same sequential benchmarks, and use it to answer that question.</p>
     <p class="authors">
       <span class="name">Anne Harrington<sup>1*</sup></span><span class="sep">·</span>
       <span class="name">Nayan Saxena<sup>2</sup></span><span class="sep">·</span>
       <span class="name">Michael Murphy<sup>1</sup></span><span class="sep">·</span>
       <span class="name">Anastasia Borovykh<sup>3</sup></span><span class="sep">·</span>
+      <span class="name">Zeyu Yun<sup>1</sup></span><span class="sep">·</span>
       <span class="name">Sridhar Kamath<sup>2</sup></span><span class="sep">·</span>
       <span class="name">Ara Eindra Kyi<sup>2</sup></span><span class="sep">·</span>
       <span class="name">Trevor Darrell<sup>1</sup></span><span class="sep">·</span>
@@ -456,8 +477,10 @@
       For decades, continual learning was defined as the problem of
       mitigating <em>catastrophic forgetting</em>: how do you learn task B
       without erasing task A? Classic approaches kept old skills intact by
-      composing or partitioning model parameters, and benchmarks measured
-      how cleanly a model could hold a chain of disjoint tasks at once.
+      adding task-specific parameters on top of a shared model or
+      partitioning parameters into a separate set per task, and benchmarks
+      measured a model's retention across a sequential chain of unrelated
+      tasks.
     </p>
     <p class="note">
       In the era of large language models, the problem is more nuanced.
@@ -502,18 +525,22 @@
       We measure capability by examining how a model learns under different
       kinds of data change. We separate those changes along two axes. Space
       is domain shift: a new task or distribution. Time holds the task fixed
-      while the world drifts. We study two kinds: a slow temporal drift,
-      where the signal shifts gradually year over year (companies' annual
-      10-K financial filings), and a selective change, where a single fact is
-      updated while the rest must be preserved (facts edited between
-      Wikipedia revisions). We return to each in Sections Five and Six.
+      while the world drifts. We study two kinds: a selective change, where
+      a single fact is updated while the rest must be preserved (facts edited
+      between Wikipedia revisions), and a slow temporal drift, where the
+      signal shifts gradually year over year (companies' annual 10-K
+      financial filings). We order these from the more standard,
+      literature-rooted tasks toward newer and more realistic ones, and
+      return to each in turn.
     </p>
     <figure class="teaser">
-      <img src="teaser.png" style="width:100%;height:auto;display:block;"
-           alt="Space and Time. Space: Domain Shift. Time: temporal drift in 10-K filings, and selective change in Wikipedia facts.">
+      <img src="teaser_overview_4x.png" style="width:100%;height:auto;display:block;"
+           alt="Overview. Top: the kinds of change the world presents, organized by Space (domain shift) and Time (fact update, temporal drift, agentic state). Middle: a unified continual-learning framework. Bottom: where the eight methods fit, across prompting, supervised fine-tuning, reinforcement learning, and memory or compression.">
     </figure>
     <span class="caption">
-      The settings we evaluate, organised by Space and Time.
+      An overview of our project: the kinds of change the world presents
+      (Space and Time), the unified continual-learning framework we use to
+      evaluate them, and where the eight methods fit.
     </span>
     <div class="insight-bubble">
       <span class="ib-label">Insight</span>
@@ -534,7 +561,7 @@
       and evaluates every method under one mechanism-agnostic protocol, so
       prompt, weight, and architectural updates can be compared on equal
       ground. We run eight methods across four families on a single backbone
-      (Qwen3-8B); they differ in what they carry across a stage boundary: a
+      (Qwen3-8B). They differ in what they carry across a stage boundary: a
       prompt, the weights, or a small per-stage component on a frozen
       backbone.
     </p>
@@ -545,10 +572,10 @@
       <tbody>
         <tr><td><span class="chip prompt">Prompt</span></td><td>GEPA</td><td>evolved prompt</td></tr>
         <tr><td><span class="chip prompt">Prompt</span></td><td>ACE</td><td>markdown playbook</td></tr>
-        <tr><td><span class="chip offline">Offline</span></td><td>SFT</td><td>full parameters</td></tr>
-        <tr><td><span class="chip offline">Offline</span></td><td>SDFT</td><td>parameters + teacher (previous self)</td></tr>
-        <tr><td><span class="chip online">Online</span></td><td>GRPO</td><td>full parameters</td></tr>
-        <tr><td><span class="chip online">Online</span></td><td>SDPO</td><td>parameters + preference pool</td></tr>
+        <tr><td><span class="chip offline">Supervised fine-tuning</span></td><td>SFT</td><td>full parameters</td></tr>
+        <tr><td><span class="chip offline">Supervised fine-tuning</span></td><td>SDFT</td><td>parameters + teacher (previous self)</td></tr>
+        <tr><td><span class="chip online">Reinforcement learning</span></td><td>GRPO</td><td>full parameters</td></tr>
+        <tr><td><span class="chip online">Reinforcement learning</span></td><td>SDPO</td><td>parameters + preference pool</td></tr>
         <tr><td><span class="chip context">Compression</span></td><td>Cartridges</td><td>backbone + per-stage adapter</td></tr>
         <tr><td><span class="chip context">Compression</span></td><td>In-Place TTT</td><td>per-input update (reset)</td></tr>
       </tbody>
@@ -564,8 +591,8 @@
         <tr>
           <th>Kind of change</th>
           <th><span class="chip prompt">Prompt</span></th>
-          <th><span class="chip offline">Offline</span></th>
-          <th><span class="chip online">Online</span></th>
+          <th><span class="chip offline">Supervised fine-tuning</span></th>
+          <th><span class="chip online">Reinforcement learning</span></th>
           <th><span class="chip context">Compression</span></th>
         </tr>
       </thead>
@@ -578,18 +605,22 @@
           <td>Cartridges</td>
         </tr>
         <tr>
+          <td>Discrete fact change<span class="sub">Wikipedia revisions</span></td>
+          <td>ACE</td>
+          <td>SDFT</td>
+          <td class="rec-best">GRPO</td>
+          <td>Cartridges</td>
+        </tr>
+        <tr>
           <td>Noisy slow trend<span class="sub">10-K filings</span></td>
           <td>ACE</td>
           <td class="rec-best">SDFT</td>
           <td>SDPO</td>
           <td>Cartridges</td>
         </tr>
-        <tr>
-          <td>Discrete fact change<span class="sub">Wikipedia revisions</span></td>
-          <td>ACE</td>
-          <td>SDFT</td>
-          <td class="rec-best">GRPO</td>
-          <td>Cartridges</td>
+        <tr class="rec-soon-row">
+          <td>Agentic chains<span class="sub">long-horizon agent</span></td>
+          <td colspan="4" class="rec-soon">Coming soon</td>
         </tr>
       </tbody>
     </table>
@@ -619,6 +650,11 @@
       sets, and the star marks the task just trained. A method that
       compounds skill raises the stars while keeping the other curves up.
     </p>
+    <ul class="task-list">
+      <li><strong>ToolUse</strong> — emit the correct tool calls, matching both the action names and their JSON arguments.</li>
+      <li><strong>FinQA</strong> — numerical question answering over financial documents.</li>
+      <li><strong>SciKE-Bio</strong> — answering biomedical knowledge questions.</li>
+    </ul>
     <figure class="figure-wide" id="fig-domain"></figure>
     <p class="legend">
       <span><span class="dot" style="background:var(--c-tooluse)"></span>ToolUse</span>
@@ -648,43 +684,9 @@
 
   <hr class="rule">
 
-  <!-- ============== SECTION 6: NOISY TEMPORAL DRIFT ============== -->
-  <section id="noisy">
-    <p class="secnum">Five · Time: Noisy Slow Trend</p>
-    <h2>10-K filings, 2015&nbsp;→&nbsp;2020.</h2>
-    <p class="note">
-      We construct a temporal-drift task from SEC 10-K filings spanning
-      2015 to 2020. A 10-K is the detailed annual report a public company
-      files with the SEC on its financial performance. The task is fixed,
-      predict whether a filer's stock moves up or down over the next thirty
-      days, but the underlying market drifts year to year and the signal is
-      weak. We measure whether a method can <em>stay aligned</em> with the
-      slow trend without overfitting to a single year.
-    </p>
-    <figure class="figure-wide" id="fig-finance"></figure>
-    <p class="legend">
-      <span><span class="swatch" style="background:var(--c-past)"></span>past-year avg</span>
-      <span><span class="swatch" style="background:var(--c-future)"></span>future-year avg</span>
-      <span>★ zero-shot baseline</span>
-    </p>
-    <span class="caption">
-      SDFT lifts future-year accuracy from ≈ 0.51 to ≈ 0.63 by 2020.
-      Cartridges holds both halves around 0.55. GRPO's past-year curve
-      drops from 0.65 to 0.42 across the chain: a noisy reward
-      reinforces the wrong answer. GEPA peaks early and bleeds.
-    </span>
-    <div class="insight-bubble">
-      <span class="ib-label">Insight</span>
-      <p>Under a weak, drifting signal, methods anchored to their own past
-      (SDFT, Cartridges) stay aligned; on-policy RL amplifies the noise.</p>
-    </div>
-  </section>
-
-  <hr class="rule">
-
-  <!-- ============== SECTION 7: TEMPWIKI ============== -->
+  <!-- ============== SECTION 5: TEMPWIKI ============== -->
   <section id="discrete">
-    <p class="secnum">Six · Time: Discrete Updates</p>
+    <p class="secnum">Five · Time: Discrete Updates</p>
     <h2>When a fact changes, can the model rewrite the right one?</h2>
     <p class="note">
       We construct a knowledge-update task from four monthly Wikipedia
@@ -716,10 +718,10 @@
     <span class="caption">
       The x-axis is the three chronological slices, one per adjacent pair of
       the four monthly mirrors. GRPO is the only weight-update method whose
-      drift F1 averages above baseline. SDFT's stable F1 falls from ≈ 0.30 to ≈ 0.17:
-      the same anchoring that wins 10-K loses TempWiki. Cartridges
-      and In-place TTT keep stable F1 flat: locality, which hurt them
-      on domain shift, is the property this regime rewards.
+      drift F1 averages above baseline. SDFT's stable F1 falls from ≈ 0.30 to
+      ≈ 0.17: it spreads the update across the model and erodes settled
+      facts. Cartridges and In-place TTT keep stable F1 flat: locality, which
+      hurt them on domain shift, is the property this regime rewards.
     </span>
     <p class="note" style="font-size:0.88rem; color:var(--gray); margin-top:0.7rem;">
       The knowledge-update protocol likewise follows
@@ -729,8 +731,59 @@
     </p>
     <div class="insight-bubble">
       <span class="ib-label">Insight</span>
-      <p>Only GRPO rewrites a changed fact without erasing the rest; the
-      anchoring that wins the slow trend fails here.</p>
+      <p>Only GRPO rewrites a changed fact without erasing the rest; methods
+      that anchor to the model's own past spread the change and damage
+      settled facts.</p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ============== SECTION 6: NOISY TEMPORAL DRIFT ============== -->
+  <section id="noisy">
+    <p class="secnum">Six · Time: Noisy Slow Trend</p>
+    <h2>10-K filings, 2015&nbsp;→&nbsp;2020.</h2>
+    <p class="note">
+      We construct a temporal-drift task from SEC 10-K filings spanning
+      2015 to 2020. A 10-K is the detailed annual report a public company
+      files with the SEC on its financial performance. The task is fixed,
+      predict whether a filer's stock moves up or down over the next thirty
+      days, but the underlying market drifts year to year and the signal is
+      weak. We measure whether a method can <em>stay aligned</em> with the
+      slow trend without overfitting to a single year.
+    </p>
+    <figure class="figure-wide" id="fig-finance"></figure>
+    <p class="legend">
+      <span><span class="swatch" style="background:var(--c-past)"></span>past-year avg</span>
+      <span><span class="swatch" style="background:var(--c-future)"></span>future-year avg</span>
+      <span>★ zero-shot baseline</span>
+    </p>
+    <span class="caption">
+      SDFT lifts future-year accuracy from ≈ 0.51 to ≈ 0.63 by 2020.
+      Cartridges holds both halves around 0.55. GRPO's past-year curve
+      drops from 0.65 to 0.42 across the chain: a noisy reward
+      reinforces the wrong answer. GEPA peaks early and bleeds.
+    </span>
+    <p class="note" style="margin-top:1.6rem;">
+      For the prompting family, we look directly at the evolved prompt to see
+      why it fails to transfer forward. GEPA discovers generic
+      financial-analysis heuristics (right) rather than the moves of an ideal
+      adaptive analyst (left): discarding irrelevant sections, normalizing
+      sentiment relative to a sector or company baseline, or distinguishing
+      newly informative elements from those already priced in by the market.
+      It overfits to transient textual heuristics while failing to preserve
+      signals that remain predictive out-of-sample.
+    </p>
+    <figure class="figure-wide">
+      <img src="gepa_prompt_diff.png" style="width:100%;height:auto;display:block;"
+           alt="GEPA prompt evolution on the 10-K task. Left, an ideal analyst diff: discard sparse or backward-looking sections, weight risk factors, normalize sentiment to a historical baseline for the company and sector, and update heuristics over time. Right, GEPA's optimizer diff: add generic static indicators of positive and negative sentiment.">
+    </figure>
+    <div class="insight-bubble">
+      <span class="ib-label">Insight</span>
+      <p>Under a weak, drifting signal, methods anchored to their own past
+      (SDFT, Cartridges) stay aligned; the anchoring that erased facts under
+      selective updates pays off here, while on-policy RL amplifies the
+      noise.</p>
     </div>
   </section>
 
@@ -742,7 +795,7 @@
     <h2>No single method handles every kind of change.</h2>
     <p class="pullquote">
       Continual learning is not a single capability. The kind of change in
-      the data determines which update behaviour succeeds.
+      the data determines which update behavior succeeds.
     </p>
     <p class="note">
       Across our evaluations we observe a consistent set of tradeoffs.
@@ -750,13 +803,28 @@
       on future ones; distillation-based methods accumulate knowledge stably
       yet struggle to update outdated facts; context compression improves
       efficiency without substantially improving the ability to learn new
-      tasks; and online reinforcement learning adapts most effectively to
-      factual change but remains sensitive to noisy reward signals. Because
+      tasks; and reinforcement learning adapts most effectively to factual
+      change but remains sensitive to noisy reward signals. Because
       these tradeoffs cut in opposite directions across regimes, no single
       method in our comparison handles more than one regime well, and a
       single benchmark number cannot reveal whether a model is continually
       learning or merely reshuffling what it already knows.
     </p>
+    <table class="spark methods sw">
+      <thead>
+        <tr><th>Method</th><th>Strength</th><th>Weakness</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="m" style="color:#8C3D00">GEPA</td><td>Fits the current stage fastest.</td><td>Degrades on later stages; no per-task memory.</td></tr>
+        <tr><td class="m" style="color:#8C3D00">ACE</td><td>Fits fast; slightly more stable than GEPA.</td><td>Same forward degradation across stages.</td></tr>
+        <tr><td class="m" style="color:#005A42">SFT</td><td>Simple full fine-tune.</td><td>Overwrites prior skills; near chance under noisy drift.</td></tr>
+        <tr><td class="m" style="color:#005A42">SDFT</td><td>Accumulates skills stably.</td><td>Slow to overwrite a single outdated fact.</td></tr>
+        <tr><td class="m" style="color:#9c2f24">GRPO</td><td>Best at rewriting a changed fact.</td><td>Sensitive to noisy or weak reward.</td></tr>
+        <tr><td class="m" style="color:#9c2f24">SDPO</td><td>Stable accumulation, like SDFT.</td><td>Struggles to update discrete facts.</td></tr>
+        <tr><td class="m" style="color:#00557F">Cartridges</td><td>Most stable; cheap per-stage memory.</td><td>Learns little new-task skill.</td></tr>
+        <tr><td class="m" style="color:#00557F">In-Place TTT</td><td>Local, per-input adaptation.</td><td>Limited new-task acquisition.</td></tr>
+      </tbody>
+    </table>
     <p class="note">
       Our reframing is simple but important: improving a model's score on a
       benchmark is not the same as helping a model <em>become more competent
@@ -773,14 +841,45 @@
     <p class="secnum">Eight · What's Next</p>
     <h2>Agentic continual learning.</h2>
     <p class="note">
-      The Space and Time settings we have studied give us the building
-      blocks to take on the hardest case next: long-horizon agentic tasks,
-      where the two axes combine. Each action conditions the next, and the
-      model must carry a history of interactions forward. Full results are
-      coming soon.
+      The benchmarks above each construct one kind of change in isolation.
+      The closest setting to deployed use is an agent acting in an
+      application across a chain of tasks, where the state left by one task
+      becomes the starting point of the next. We build this on
+      WebArena-Infinity: chains of web tasks of length L, in which step
+      <em>i</em>+1 depends on state that step <em>i</em> leaves behind. In
+      Gmail, the agent creates a label, renames it, then applies the renamed
+      label to a specific email, and a verifier reads the app's state to
+      check end-to-end success. Because the sequence arises from the agent's
+      own actions rather than an ordering we imposed, we treat it as the
+      most realistic instantiation of continual learning over time.
     </p>
+    <p class="note">
+      As a first look at whether experience compounds here, we add learning
+      two ways: an ACE playbook on Qwen-32B, and supervised fine-tuning of
+      Qwen-8B on the 32B agent's own traces. Both raise chain success over a
+      no-learning baseline at every horizon length, with the largest gains
+      on the three-step (L3) chains.
+    </p>
+    <figure class="figure-wide" id="fig-agent" style="max-width:calc(var(--measure) * 0.66); margin-left:auto; margin-right:auto;"></figure>
+    <p class="legend">
+      <span><span class="swatch" style="background:#1d4ed8"></span>Qwen-32B (ACE)</span>
+      <span><span class="swatch" style="background:#c2410c"></span>Qwen-8B (SFT)</span>
+      <span><span class="swatch" style="background:var(--gray)"></span>after, solid</span>
+      <span><span class="swatch dashed" style="color:var(--gray)"></span>before, dashed</span>
+    </p>
+    <span class="caption">
+      End-to-end chain success rate across chain lengths L1 to L5, with all
+      four series on one axis. Color marks the model (blue Qwen-32B, red
+      Qwen-8B); line style marks the stage, dashed for the zero-shot baseline
+      and solid for the most-trained variant (the L10 ACE playbook on
+      Qwen-32B, sft-L5 for Qwen-8B fine-tuned on the 32B agent's traces).
+      Both models gain at every length, most on the three-step (L3) chains;
+      the distilled 8B starts near zero past L1 and gains the most room.
+    </span>
     <figure class="coming-soon">
       <span class="cs-badge">Coming soon</span>
+      <span class="cs-note">Full agentic continual-learning results across
+        all apps, horizons, and methods are on the way.</span>
     </figure>
   </section>
 
@@ -1511,6 +1610,19 @@ const C={
   tooluse:'#2563eb', finqa:'#db2777', bio:'#0e7490',
   past:'#2563eb', future:'#db2777', base:'#9b8847'
 };
+// Family colours (match the chip palette): so panel titles carry the
+// same family tag readers see in the methods tables.
+const FAMCOL={
+  GEPA:'#8C3D00', ACE:'#8C3D00',              // Prompt
+  SFT:'#005A42', SDFT:'#005A42',              // Supervised fine-tuning
+  GRPO:'#9c2f24', SDPO:'#9c2f24',             // Reinforcement learning
+  Cartridges:'#00557F', 'In-Place TTT':'#00557F' // Compression
+};
+// Draw a panel title prefixed with a small family-coloured dot.
+function panelTitle(s, cx, cy, m){
+  s.appendChild(el('circle',{cx:cx+3.5, cy:cy-9.5, r:3.4, fill:FAMCOL[m]||C.gray}));
+  txt(s, cx+12, cy-6, m, 'panel-title');
+}
 function el(t,a={}){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;}
 function svg(w,h){return el('svg',{viewBox:`0 0 ${w} ${h}`,preserveAspectRatio:'xMidYMid meet'});}
 function txt(parent,x,y,str,cls='axis-text',anchor='start',fill=null){
@@ -1521,7 +1633,7 @@ const PATH = (xy)=> xy.map((p,i)=>(i?'L':'M')+p[0].toFixed(2)+' '+p[1].toFixed(2
 
 // 5-point star as a proper SVG path. Consistent rendering across
 // browsers (unlike Unicode ★ which depends on system fonts), and
-// gives us precise control over weight + colour.
+// gives us precise control over weight + color.
 function starPath(cx, cy, r){
   let d = '';
   for (let i = 0; i < 10; i++) {
@@ -1534,7 +1646,7 @@ function starPath(cx, cy, r){
   return d + 'Z';
 }
 
-// Annotation colour for baselines — muted warm gold. Lighter than
+// Annotation color for baselines — muted warm gold. Lighter than
 // the ink data so the baselines layer BEHIND the curves visually
 // (per design.md: annotations even lighter than secondary data).
 const BASELINE_GOLD = '#b8a672';
@@ -1579,7 +1691,7 @@ function yTicks(s, x, ys, Y, fmt, color){
     const Y=v=>cy+ph-(v-yMin)/(yMax-yMin)*ph;
 
     // title
-    txt(s,cx,cy-6,m,'panel-title');
+    panelTitle(s,cx,cy,m);
 
     // range-frame y-axis on left column
     if(k%cols===0){
@@ -1618,10 +1730,11 @@ function yTicks(s, x, ys, Y, fmt, color){
       data.forEach((v,i)=>{
         if(v==null) return;
         const own=(ownStage[task]===i);
+        const taskColor=task==='tooluse'?C.tooluse:(task==='finqa'?C.finqa:C.bio);
         if(own){
-          s.appendChild(el('circle',{cx:X(i),cy:Y(v),r:4.5, class:'point',
-            fill:task==='tooluse'?C.tooluse:(task==='finqa'?C.finqa:C.bio),
-            stroke:C.paper,'stroke-width':1.5}));
+          // just-trained stage: a star (matches the legend "★")
+          s.appendChild(el('path',{d:starPath(X(i),Y(v),5.6), class:'point',
+            fill:taskColor, stroke:C.paper,'stroke-width':1.1}));
         } else {
           s.appendChild(el('circle',{cx:X(i),cy:Y(v),r:2.6, class:'point',
             fill:C.paper,stroke:task==='tooluse'?C.tooluse:(task==='finqa'?C.finqa:C.bio),'stroke-width':1.4}));
@@ -1651,7 +1764,7 @@ function yTicks(s, x, ys, Y, fmt, color){
     const X=i=>cx+10+i/(years.length-1)*(pw-20);
     const Y=v=>cy+ph-(v-yMin)/(yMax-yMin)*ph;
 
-    txt(s,cx,cy-6,m,'panel-title');
+    panelTitle(s,cx,cy,m);
 
     if(k%cols===0){
       rangeFrame(s,cx-2,Y(yMax),cx-2,Y(yMin));
@@ -1684,7 +1797,7 @@ function yTicks(s, x, ys, Y, fmt, color){
     d.future.forEach((v,i)=>{if(v!=null) s.appendChild(el('circle',{cx:X(i),cy:Y(v),r:2.4,class:'point',
       fill:C.paper,stroke:C.future,'stroke-width':1.3}));});
     // Baseline ★ as a proper SVG path — small, muted gold, precisely
-    // centred. Renders identically on every browser.
+    // centered. Renders identically on every browser.
     d.baseline.forEach((v,i)=>{
       if(v==null) return;
       s.appendChild(el('path',{d: starPath(X(i), Y(v), 4.2),
@@ -1713,7 +1826,7 @@ function yTicks(s, x, ys, Y, fmt, color){
     const X=i=>cx+18+i/(slices.length-1)*(pw-36);
     const Y=v=>cy+ph-(v-yMin)/(yMax-yMin)*ph;
 
-    txt(s,cx,cy-6,m,'panel-title');
+    panelTitle(s,cx,cy,m);
 
     if(k%cols===0){
       rangeFrame(s,cx-2,Y(yMax),cx-2,Y(yMin));
@@ -1748,7 +1861,7 @@ function yTicks(s, x, ys, Y, fmt, color){
     // ★ STABLE baseline — single scalar SFT zero-shot stable F1
     // drawn as outline stars across all slices. Outline vs. filled
     // gives a clean visual distinction from the drift baseline
-    // (same colour, lower visual weight — layered behind).
+    // (same color, lower visual weight — layered behind).
     const sb = D.tempwiki_stable_baseline;
     if (sb != null) {
       slices.forEach((sl,i)=>{
@@ -1762,6 +1875,58 @@ function yTicks(s, x, ys, Y, fmt, color){
   xt.textContent='Chronological slice (Nov 2025 → Feb 2026)';
   s.appendChild(xt);
   document.getElementById('fig-tempwiki').appendChild(s);
+})();
+
+/* ============================================================
+   FIG: AGENTIC GMAIL — all four series on one panel.
+   Color = model (32B blue / 8B red); style = before vs. after
+   (dashed open = zero-shot, solid filled = most-trained). The
+   dashed "before" lines deliberately skip class:'curve' so the
+   reveal animation (which forces stroke-dasharray) doesn't turn
+   them solid; only the solid "after" lines draw in.
+   ============================================================ */
+(function(){
+  const host=document.getElementById('fig-agent'); if(!host) return;
+  const padL=58, padT=22, padR=22, pw=430, ph=248, padB=50;
+  const W=padL+pw+padR, H=padT+ph+padB;
+  const s=svg(W,H); s.setAttribute('width','100%');
+
+  const levels=['L1','L3','L5'];
+  const series=[
+    {color:C.space, before:true,  d:[47.3,32.4,28.2]},  // 32B zero-shot
+    {color:C.space, before:false, d:[50.0,46.5,31.6]},  // 32B ACE (L10)
+    {color:C.red,   before:true,  d:[33.3,0.0,0.0]},     // 8B base
+    {color:C.red,   before:false, d:[43.3,23.3,16.7]}    // 8B sft-L5
+  ];
+  const yMin=0, yMax=60;
+  const cx=padL, cy=padT;
+  const X=i=>cx+30+i/(levels.length-1)*(pw-60);
+  const Y=v=>cy+ph-(v-yMin)/(yMax-yMin)*ph;
+
+  rangeFrame(s,cx-2,Y(yMax),cx-2,Y(yMin));
+  yTicks(s,cx-2,[0,20,40,60],Y,v=>v);
+  const yt=el('text',{x:cx-42,y:cy+ph/2,'text-anchor':'middle',class:'axis-text'});
+  yt.setAttribute('transform',`rotate(-90 ${cx-42} ${cy+ph/2})`);
+  yt.textContent='Chain success (%)'; s.appendChild(yt);
+
+  xAxisLine(s,cx-2,cx+pw,cy+ph);
+  levels.forEach((l,i)=>txt(s,X(i),cy+ph+16,l,'axis-num','middle'));
+  txt(s,cx+pw/2,cy+ph+40,'Chain length (L)','axis-text','middle');
+
+  series.forEach(se=>{
+    const line=se.d.map((v,i)=>[X(i),Y(v)]);
+    const attrs={d:PATH(line),fill:'none',stroke:se.color,
+      'stroke-width':se.before?1.5:2.4};
+    if(se.before){ attrs['stroke-dasharray']='5 4'; }
+    else { attrs['class']='curve'; }
+    s.appendChild(el('path',attrs));
+    se.d.forEach((v,i)=>s.appendChild(el('circle',{cx:X(i),cy:Y(v),
+      r:se.before?2.8:4,
+      fill:se.before?C.paper:se.color, stroke:se.color,
+      'stroke-width':1.4, class:'point'})));
+  });
+
+  host.appendChild(s);
 })();
 
 /* Copy-to-clipboard for citation blocks */
