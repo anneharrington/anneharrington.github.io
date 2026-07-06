@@ -909,19 +909,18 @@
     </p>
     <figure class="figure-wide" id="fig-agent" style="max-width:calc(var(--measure) * 0.66); margin-left:auto; margin-right:auto;"></figure>
     <p class="legend">
-      <span><span class="swatch" style="background:#1d4ed8"></span>Qwen-32B (ACE)</span>
-      <span><span class="swatch" style="background:#c2410c"></span>Qwen-8B (SFT)</span>
-      <span><span class="swatch" style="background:var(--gray)"></span>after, solid</span>
-      <span><span class="swatch dashed" style="color:var(--gray)"></span>before, dashed</span>
+      <span><span class="swatch" style="background:#1d4ed8"></span>Qwen-32B + ACE</span>
+      <span><span class="swatch dashed" style="color:#1d4ed8"></span>Qwen-32B zero-shot</span>
+      <span><span class="swatch" style="background:#c2410c"></span>Qwen-8B + SFT</span>
+      <span><span class="swatch dashed" style="color:#c2410c"></span>Qwen-8B zero-shot</span>
     </p>
     <span class="caption">
-      End-to-end chain success rate across chain lengths L1 to L5, with all
+      End-to-end chain success rate across chain lengths L1 to L10, with all
       four series on one axis. Color marks the model (blue Qwen-32B, red
-      Qwen-8B); line style marks the stage, dashed for the zero-shot baseline
-      and solid for the most-trained variant (the L10 ACE playbook on
-      Qwen-32B, sft-L5 for Qwen-8B fine-tuned on the 32B agent's traces).
-      Both models gain at every length, most on the three-step (L3) chains;
-      the distilled 8B starts near zero past L1 and gains the most room.
+      Qwen-8B); solid lines are the update mechanisms (an ACE playbook on
+      Qwen-32B, and SFT on Qwen-8B distilled from teacher traces) and dashed
+      lines are the corresponding zero-shot baselines. Both mechanisms gain
+      over their baseline at every length, most on the three-step (L3) chains.
     </span>
     <figure class="coming-soon">
       <span class="cs-badge">Coming soon</span>
@@ -1939,14 +1938,14 @@ function yTicks(s, x, ys, Y, fmt, color){
   const W=padL+pw+padR, H=padT+ph+padB;
   const s=svg(W,H); s.setAttribute('width','100%');
 
-  const levels=['L1','L3','L5'];
+  const levels=['L1','L3','L5','L10'];
   const series=[
-    {color:C.space, before:true,  d:[47.3,32.4,28.2]},  // 32B zero-shot
-    {color:C.space, before:false, d:[50.0,46.5,31.6]},  // 32B ACE (L10)
-    {color:C.red,   before:true,  d:[33.3,0.0,0.0]},     // 8B base
-    {color:C.red,   before:false, d:[43.3,23.3,16.7]}    // 8B sft-L5
+    {color:C.space, before:true,  d:[47.3,32.4,28.2,15.2]},  // 32B zero-shot
+    {color:C.space, before:false, d:[50.0,46.5,31.6,16.5]},  // 32B ACE (L10 playbook)
+    {color:C.red,   before:true,  d:[33.3,0.0,0.0,0.0]},     // 8B base
+    {color:C.red,   before:false, d:[60.0,40.0,20.0,6.7]}    // 8B sft-L10
   ];
-  const yMin=0, yMax=60;
+  const yMin=0, yMax=64;
   const cx=padL, cy=padT;
   const X=i=>cx+30+i/(levels.length-1)*(pw-60);
   const Y=v=>cy+ph-(v-yMin)/(yMax-yMin)*ph;
