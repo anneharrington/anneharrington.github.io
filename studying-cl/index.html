@@ -146,8 +146,6 @@
     padding: 0.45em 0.85em; cursor: default; user-select: none;
   }
   .res-btn svg { display: inline-block; flex: none; }
-  a.res-btn { cursor: pointer; text-decoration: none; transition: color 0.15s ease, border-color 0.15s ease; }
-  a.res-btn:hover { color: var(--signature); border-color: var(--signature); }
   .res-btn .soon-tag {
     font-size: 0.62rem; font-weight: 600; letter-spacing: 0.06em;
     text-transform: uppercase; color: var(--signature);
@@ -511,10 +509,10 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         arXiv<span class="soon-tag">coming soon</span>
       </span>
-      <a class="res-btn" href="https://github.com/anneharrington/studying-cl" target="_blank" rel="noopener" title="Code on GitHub">
+      <span class="res-btn" role="button" aria-disabled="true" title="Code (coming soon)">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-        Code
-      </a>
+        Code<span class="soon-tag">coming soon</span>
+      </span>
     </p>
   </header>
 
@@ -917,11 +915,11 @@
       <span><span class="swatch dashed" style="color:var(--gray)"></span>before, dashed</span>
     </p>
     <span class="caption">
-      End-to-end chain success rate across chain lengths L1 to L5, with all
+      End-to-end chain success rate across chain lengths L1 to L10, with all
       four series on one axis. Color marks the model (blue Qwen-32B, red
-      Qwen-8B); line style marks the stage, dashed for the zero-shot baseline
-      and solid for the most-trained variant (the L10 ACE playbook on
-      Qwen-32B, sft-L5 for Qwen-8B fine-tuned on the 32B agent's traces).
+      Qwen-8B); solid lines are the update mechanisms (an ACE playbook on
+      Qwen-32B, and SFT on Qwen-8B distilled from the 32B agent's traces)
+      and dashed lines are the corresponding zero-shot baselines.
       Both models gain at every length, most on the three-step (L3) chains;
       the distilled 8B starts near zero past L1 and gains the most room.
     </span>
@@ -1941,12 +1939,12 @@ function yTicks(s, x, ys, Y, fmt, color){
   const W=padL+pw+padR, H=padT+ph+padB;
   const s=svg(W,H); s.setAttribute('width','100%');
 
-  const levels=['L1','L3','L5'];
+  const levels=['L1','L3','L5','L10'];
   const series=[
-    {color:C.space, before:true,  d:[47.3,32.4,28.2]},  // 32B zero-shot
-    {color:C.space, before:false, d:[50.0,46.5,31.6]},  // 32B ACE (L10)
-    {color:C.red,   before:true,  d:[33.3,0.0,0.0]},     // 8B base
-    {color:C.red,   before:false, d:[43.3,23.3,16.7]}    // 8B sft-L5
+    {color:C.space, before:true,  d:[47.3,32.4,28.2,15.2]},  // 32B zero-shot
+    {color:C.space, before:false, d:[50.0,46.5,31.6,16.5]},  // 32B ACE
+    {color:C.red,   before:true,  d:[33.3,0.0,0.0,0.0]},      // 8B base
+    {color:C.red,   before:false, d:[60.0,40.0,20.0,6.7]}     // 8B SFT
   ];
   const yMin=0, yMax=60;
   const cx=padL, cy=padT;
